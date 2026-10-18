@@ -23,6 +23,7 @@ F_CLIMB_BASE: 117.000 # Climb thrust per engine - N
 # To complete
 
 """ Operational Parameters"""
+K_DER_TO = 900 # Take-off thrust derate rate - N/°C
 
 #### To complete
 
@@ -90,9 +91,35 @@ def Pressure_actual(h:float):
 def Rho(h:float):
     return RHO_0 * (Pressure_actual(h)/P0) * (Temperature_ISA(0)/Temperature_actual(h)) * CP
 
+def Temperature_flat(h:float):
+    if h>0:
+        return Temperature_ISA(h)+15
+    elif h==0:
+        return 30
+
+def delta_T_isa(h,Temp):
+    return Temp - Temperature_ISA(h)
+
 
 #######################################################################
 ##################### Thrust calculation (5.5.3) ######################
 #######################################################################
+
+def Fto_base(h:float,Temp):
+    """Determine temperature regime and compute base thrust
+
+    Args:
+        h (float): geometric altitude in meters
+        Temp (_type_): Actual temperature
+
+    Returns:
+        _type_: _description_
+    """    
+    if delta_T_isa(h,Temp)<Temperature_flat(h):
+        Fto=F_TO_BASE
+    else:
+        Fto=F_TO_BASE-K_DER_TO(delta_T_isa(h,Temp)-Temperature_flat(h))
+    return Fto
+
 
 
