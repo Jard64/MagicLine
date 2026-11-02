@@ -172,7 +172,7 @@ def correction_factor(h:float):
         return 1-0.06*(h/1000) # Traditional linear penalty applies 6% reduction per 1000 meters altitude, representing conservative operational rule-of-thumb
 
 def correct_thrust(Fthrust:float,h:float):
-    """correct the climb and TO thrust following the chosen correction factor
+    """correct the climb and TO thrust following the calculated correction factor
 
     Args:
         Fthrust (float): Thrust to correct in N
