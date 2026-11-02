@@ -1,3 +1,3 @@
 # MagicLine
 
-PIE ETE-06 test
+PIE ETE-06
