@@ -17,8 +17,8 @@ K_VS1G_MIN = 1.13 # Minimum speed margin factor -
 """Propulsion System (CFM56-7B24 engines) """
 
 N_ENGINES = 2 # Number of engines
-F_TO_BASE: 117.000 # Take-off thrust per engine - N
-F_CLIMB_BASE: 117.000 # Climb thrust per engine - N
+F_TO_BASE: 117000 # Take-off thrust per engine - N
+F_CLIMB_BASE: 117000 # Climb thrust per engine - N
 
 # To complete
 
@@ -32,7 +32,7 @@ K_DER_CLIMB = 850 # Climb thrust derate rate - N/°C
 
 T0 = 15 # sea-level standard temperature - celsius
 L = 0.0065 # temperature lapse rate - K/m
-P0 = 101,325 # sea-level standard temperature - Pa
+P0 = 101325 # sea-level standard temperature - Pa
 G0 = 9.80665 # standard gravitational acceleration - m/s^2
 R = 287.05 # specific gas constant for air - J/(kg·K)
 RHO_0 = 1.225 # sea-level standard density - kg/m^3
@@ -90,6 +90,14 @@ def Pressure_actual(h:float):
     return P0 * (1 - L*h/T0)^(G0/(R*L))
 
 def Rho(h:float):
+    """Vertical density
+
+    Args:
+        h (float): geometric altitude in meters
+
+    Returns:
+        float: density at h
+    """    
     return RHO_0 * (Pressure_actual(h)/P0) * (Temperature_ISA(0)/Temperature_actual(h)) * CP
 
 def Temperature_flat(h:float):
