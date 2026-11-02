@@ -1,45 +1,38 @@
 r"""
-Autres modèles d'avion pour le modèle Magic Line (MelvinxClaudine.py).
+Construction des avions du modèle Magic Line (MelvinxClaudine.py) à partir du catalogue.
 
-La thèse ne paramètre que le Boeing 737-800 (5.5.1). Ce fichier construit des
-instances `Aircraft` pour d'autres monocouloirs bimoteurs, à partir de données
-publiques sourcées (voir SOURCES.md), en gardant le B737-800 de la thèse comme
-référence de calibration pour les grandeurs qui ne sont pas publiées.
+Le catalogue (catalogue.csv, rempli par import_catalogue.py) contient les données
+brutes sourcées de chaque avion : OpenAP, ICAO Engine Emissions Databank, EUROCONTROL
+APD (voir SOURCES.md). Ce module en tire les paramètres `Aircraft`, selon deux méthodes :
 
-    Avion             Moteur (défaut)     Variante
-    A319ceo           CFM56-5B6/P         -
-    A320ceo           CFM56-5B4/P         -
-    A320neo           LEAP-1A26           A320neo PW1127G-JM
-    A321ceo           CFM56-5B3/P         -
-    A321neo           LEAP-1A33           A321neo PW1133G-JM
-    B737 MAX 8        LEAP-1B27           -
+  methode="direct"  (par défaut) - chaque avion est traité de la même façon, sans
+                    utiliser les valeurs du B737-800 de la thèse :
+      C_L_max   (5.18) : 2 m g / (ρ0 S (V2/1.13)²), m et V2 EUROCONTROL
+      C_D0      configuration 2e segment (train rentré, volets décollage, un moteur
+                en panne) : C_D0,lisse + ΔC_D0,volets + ΔC_D0,moulinet
+                  ΔC_D0,volets   = λ_f (c_f/c)^1.38 (S_f/S) sin²δ      (McCormick, via OpenAP)
+                  ΔC_D0,moulinet = 0.3 · (π D_fan²/4) / S              (Raymer, ordre de grandeur)
+      K         1 / (1/K_lisse + π A Δe),  Δe = 0.0026 δ (moteurs sous l'aile, Obert via OpenAP)
 
-Méthode de construction de chaque paramètre :
+  methode="echelle" - méthode de la première version : C_D0 et K du B737-800 de la
+                    thèse, multipliés par le rapport des polaires OpenAP (avion / B737-800).
+                    Garde le niveau de traînée de la thèse (validée sur le B737-800).
 
-  S, OEW, MTOW         OpenAP (TU Delft), fichiers aircraft/<code>.yml
-  F_to_base            poussée certifiée au décollage, ICAO Engine Emissions
-                       Databank (reprise dans OpenAP engines.csv)
-  F_climb_base         F_to_base × (112 000 / 117 000)      (ratio B737-800 thèse)
-  k_derate_to/_climb   k_B738 × F_base / F_base,B738        (même pente relative)
-  T_flat               ISA+15 °C, comme la thèse (confirmé pour le LEAP-1A : 30 °C)
-  C_L_max              reconstruit par (5.18) à partir de V2 et de la masse
-                       EUROCONTROL APD :  C_L,max = 2 m g / (ρ0 S (V2/1.13)²)
-  C_D0, K              transfert par similitude depuis le B737-800 de la thèse :
-                       X_avion = X_B738,thèse × X_OpenAP(avion) / X_OpenAP(B738)
-                       avec X_OpenAP la polaire OpenAP en configuration décollage
-                       (lisse + volets + train, formules de openap/drag.py)
-  alpha, beta          corrélation bimoteur de la thèse MAGIC_LINE_TWIN (5.19)
+Communs aux deux méthodes :
+  S, OEW, MTOW         OpenAP
+  F_to_base            ICAO EEDB (poussée certifiée)
+  F_climb_base         F_to_base × 112/117                  (rapport de la thèse)
+  k_derate             F_base × 0.77 %/°C (TO), 0.76 %/°C (montée) (pente relative de la thèse)
+  T_flat               15 °C (ISA+15)
+  alpha, beta          corrélation Magic Line de la thèse choisie dans la colonne `magic_line`
 
-Contrôles faits sur le B737-800 (même chaîne appliquée à la référence) :
-  - (5.18) + EUROCONTROL donne C_L,max = 2.08, la thèse prend 2.10 ;
-  - ICAO donne 116.99 kN pour le CFM56-7B26, la thèse prend 117 kN.
-
-Remarque : seul le produit S·C_L,max entre dans V_LOF et F_TOL. Comme C_L,max est
-reconstruit avec le même S, le choix de la surface de référence (124 m² OpenAP ou
-122.6 m² Airbus pour l'A320) n'a pas d'effet sur la TOFL.
+Toute colonne du catalogue portant le nom d'un champ `Aircraft` (C_L_max, C_D0, K,
+T_flat, alpha, beta, ...) et non vide remplace la valeur calculée : c'est le moyen de
+forcer une donnée constructeur connue.
 """
 
-from dataclasses import replace
+import csv
+from dataclasses import fields, replace
 import math
 import os
 import sys
@@ -47,139 +40,163 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from MelvinxClaudine import (Aircraft, B738, G0, RHO_0, K_VS1G_MIN, MAGIC_LINE_TWIN,
+                             MAGIC_LINE_UNIFIED, MAGIC_LINE_QUAD, MAGIC_LINE_B738,
                              take_off_performance)
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+CATALOGUE = os.path.join(HERE, "catalogue.csv")
 
 KT = 0.514444 # knot -> m/s
 
+""" Rapports repris du B737-800 de la thèse (5.5.1), appliqués à tous les avions """
 
-###############################################################################
-################## Données sources brutes (cf. SOURCES.md) ####################
-###############################################################################
+CLIMB_TO_RATIO = B738.F_climb_base / B738.F_to_base # 112/117
+DERATE_REL_TO = B738.k_derate_to / B738.F_to_base # 0.77 %/°C
+DERATE_REL_CLIMB = B738.k_derate_climb / B738.F_climb_base # 0.76 %/°C
 
-""" OpenAP - géométrie, masses, polaire lisse, volets (aircraft/*.yml, dragpolar/*.yml) """
+""" Traînée de moulinet du moteur en panne """
 
-OPENAP = {
-    #        S      span   MTOW    OEW    cd0    k      lambda_f cf/c   Sf/S
-    "B738": (124.6, 34.32, 79000, 41400, 0.019, 0.042, 0.900, 0.150, 0.150),
-    "A319": (124.0, 35.80, 75500, 40800, 0.020, 0.039, 0.900, 0.176, 0.170),
-    "A320": (124.0, 35.80, 78000, 42600, 0.018, 0.039, 0.900, 0.176, 0.170),
-    "A20N": (124.0, 35.80, 79000, 44300, 0.017, 0.038, 0.900, 0.176, 0.170),
-    "A321": (128.0, 35.80, 93500, 48500, 0.020, 0.041, 0.900, 0.176, 0.165),
-    "A21N": (128.0, 35.80, 97000, 50000, 0.017, 0.038, 0.900, 0.176, 0.170), # polaire = A20N (pas de fichier a21n)
-    "B38M": (124.6, 34.32, 82000, 45000, 0.020, 0.042, 0.900, 0.150, 0.150),
-}
+WINDMILL_COEF = 0.3 # D/q = 0.3 · aire de la soufflante (Raymer)
+DEFAULT_DCD_WINDMILL = 0.005 # si le diamètre de soufflante n'est pas connu
 
-""" Braquage volets au décollage retenu (°) - B737 : volets 5 (thèse) ; Airbus : CONF 1+F """
+MAGIC_LINES = {"twin": MAGIC_LINE_TWIN, "unified": MAGIC_LINE_UNIFIED,
+               "quad": MAGIC_LINE_QUAD, "b738": MAGIC_LINE_B738}
 
-TAKEOFF_FLAP_DEG = {"B738": 5, "B38M": 5, "A319": 10, "A320": 10, "A20N": 10, "A321": 10, "A21N": 10}
+""" Référence OpenAP du B737-800 pour la méthode 'echelle' (dragpolar/b738.yml, volets 5°) """
 
-""" ICAO Engine Emissions Databank - poussée de décollage certifiée (N) """
-
-ENGINE_THRUST = {
-    "CFM56-7B26": 116990, # contrôle B737-800
-    "CFM56-5B6/P": 104530,
-    "CFM56-5B4/P": 117900,
-    "CFM56-5B3/P": 142350,
-    "LEAP-1A26": 120600,
-    "PW1127G-JM": 120430,
-    "LEAP-1A33": 143100, # entrée ICAO groupée LEAP-1A35A/33/33B2/32/30
-    "PW1133G-JM": 147280,
-    "LEAP-1B27": 124700,
-}
-
-""" EUROCONTROL Aircraft Performance Database - (masse kg, V2 kt IAS, distance décollage m) """
-
-EUROCONTROL_APD = {
-    "B738": (70530, 145, 2300),
-    "A319": (64000, 135, 1750),
-    "A320": (73900, 145, 2190),
-    "A20N": (79000, 145, 1951),
-    "A321": (83000, 145, 2210),
-    "A21N": (97000, 145, 2150),
-    "B38M": (82600, 145, 2500),
-}
+B738_OPENAP = dict(S_m2=124.6, envergure_m=34.32, MTOW_kg=79000, cd0_lisse=0.019, k_lisse=0.042,
+                   lambda_f=0.9, cf_c=0.15, Sf_S=0.15, volets_TO_deg=5, montage_moteur="wing")
 
 
 ###############################################################################
-################## Dérivation des paramètres ##################################
+################## Lecture du catalogue #######################################
 ###############################################################################
 
-def openap_takeoff_polar(code):
-    """(C_D0, K) OpenAP en configuration décollage (openap/drag.py, Drag.nonclean).
-
-    ΔC_D0,volets = λ_f (c_f/c)^1.38 (S_f/S) sin²δ          (McCormick 1994)
-    ΔC_D0,train  = (W/S) · 3.16e-5 · MTOW^-0.215          (Mair & Birdsall 1996)
-    K            = 1 / (1/K_lisse + π A Δe),  Δe = 0.0026 δ (Obert 2009, moteurs sous l'aile)
-    """
-    S, span, mtow, _, cd0, k, lambda_f, cfc, sfs = OPENAP[code]
-    delta = TAKEOFF_FLAP_DEG[code]
-    d_cd_flap = lambda_f * cfc ** 1.38 * sfs * math.sin(math.radians(delta)) ** 2
-    d_cd_gear = mtow * G0 / S * 3.16e-5 * mtow ** (-0.215)
-    aspect_ratio = span ** 2 / S
-    k_to = 1 / (1 / k + math.pi * aspect_ratio * 0.0026 * delta)
-    return cd0 + d_cd_flap + d_cd_gear, k_to
+def _num(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
 
 
-def scaled_polar(code):
-    """(C_D0, K) transférés depuis le B737-800 de la thèse par le rapport des polaires OpenAP."""
-    cd0_ref, k_ref = openap_takeoff_polar("B738")
-    cd0, k = openap_takeoff_polar(code)
+def charger_catalogue(path=CATALOGUE):
+    """Lignes du catalogue, valeurs numériques converties. {nom: ligne}"""
+    with open(path, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    out = {}
+    for r in rows:
+        out[r["nom"]] = {k: (_num(v) if _num(v) is not None else v) for k, v in r.items()}
+    return out
+
+
+###############################################################################
+################## Polaires ###################################################
+###############################################################################
+
+def delta_cd0_flaps(r):
+    """ΔC_D0 volets (McCormick 1994, formule OpenAP)."""
+    return (r["lambda_f"] * r["cf_c"] ** 1.38 * r["Sf_S"]
+            * math.sin(math.radians(r["volets_TO_deg"])) ** 2)
+
+
+def delta_cd0_gear(r):
+    """ΔC_D0 train sorti (Mair & Birdsall 1996, formule OpenAP)."""
+    m = r["MTOW_kg"]
+    return m * G0 / r["S_m2"] * 3.16e-5 * m ** (-0.215)
+
+
+def delta_cd0_windmill(r):
+    """ΔC_D0 du moteur en panne (moulinet) : 0.3 · aire soufflante / S."""
+    d = r.get("diam_soufflante_m")
+    if not isinstance(d, float):
+        return DEFAULT_DCD_WINDMILL
+    return WINDMILL_COEF * math.pi * d ** 2 / 4 / r["S_m2"]
+
+
+def k_flaps(r):
+    """K avec volets : 1 / (1/K + π A Δe), Δe = 0.0026 δ (0.0046 δ si moteurs à l'arrière)."""
+    de = (0.0046 if r.get("montage_moteur") == "rear" else 0.0026) * r["volets_TO_deg"]
+    aspect_ratio = r["envergure_m"] ** 2 / r["S_m2"]
+    return 1 / (1 / r["k_lisse"] + math.pi * aspect_ratio * de)
+
+
+def polaire_directe(r):
+    """(C_D0, K) en configuration 2e segment, construits sans référence à la thèse."""
+    return r["cd0_lisse"] + delta_cd0_flaps(r) + delta_cd0_windmill(r), k_flaps(r)
+
+
+def _polaire_openap_decollage(r):
+    return r["cd0_lisse"] + delta_cd0_flaps(r) + delta_cd0_gear(r), k_flaps(r)
+
+
+def polaire_echelle(r):
+    """(C_D0, K) du B737-800 de la thèse × rapport des polaires OpenAP de décollage (avion / B737-800)."""
+    cd0_ref, k_ref = _polaire_openap_decollage(B738_OPENAP)
+    cd0, k = _polaire_openap_decollage(r)
     return B738.C_D0 * cd0 / cd0_ref, B738.K * k / k_ref
 
 
-def C_L_max_from_apd(code, S):
-    """C_L,max par (5.18) : V_stall = V2 / 1.13, V2 IAS ≈ EAS au niveau de la mer (ρ0)."""
-    mass, V2_kt, _ = EUROCONTROL_APD[code]
+###############################################################################
+################## Construction des avions ####################################
+###############################################################################
+
+def C_L_max_depuis_V2(masse, V2_kt, S):
+    """(5.18) : V_stall = V2 / 1.13, V2 IAS ≈ EAS au niveau de la mer (ρ0)."""
     V_stall = V2_kt * KT / K_VS1G_MIN
-    return 2 * mass * G0 / (RHO_0 * V_stall ** 2 * S)
+    return 2 * masse * G0 / (RHO_0 * V_stall ** 2 * S)
 
 
-def make_aircraft(name, code, engine):
-    """Construit un `Aircraft` à partir des données sources et des ratios B737-800 de la thèse."""
-    S, _, mtow, oew, *_ = OPENAP[code]
-    F_to = ENGINE_THRUST[engine]
-    scale = F_to / B738.F_to_base
-    C_D0, K = scaled_polar(code)
-    return Aircraft(
-        name=f"{name} ({engine})",
-        S=S,
-        C_L_max=C_L_max_from_apd(code, S),
+def construire_avion(r, methode="direct"):
+    """`Aircraft` à partir d'une ligne du catalogue."""
+    if methode == "direct":
+        C_D0, K = polaire_directe(r)
+    elif methode == "echelle":
+        C_D0, K = polaire_echelle(r)
+    else:
+        raise ValueError("methode doit valoir 'direct' ou 'echelle'")
+
+    if isinstance(r.get("V2_kt"), float) and isinstance(r.get("masse_ref_kg"), float):
+        C_L_max = C_L_max_depuis_V2(r["masse_ref_kg"], r["V2_kt"], r["S_m2"])
+    elif isinstance(r.get("C_L_max"), float):
+        C_L_max = r["C_L_max"]
+    else:
+        raise ValueError(f"{r['nom']} : ni V2 ni C_L_max dans le catalogue")
+
+    F_to = r["F_TO_N"]
+    F_climb = F_to * CLIMB_TO_RATIO
+    ml = str(r.get("magic_line") or "twin")
+    alpha, beta = MAGIC_LINES[ml] if ml in MAGIC_LINES else map(float, ml.split(";"))
+
+    ac = Aircraft(
+        name=r["nom"],
+        S=r["S_m2"],
+        C_L_max=C_L_max,
         C_D0=C_D0,
         K=K,
-        n_engines=2,
+        n_engines=int(r["n_moteurs"]),
         F_to_base=F_to,
-        F_climb_base=B738.F_climb_base * scale,
+        F_climb_base=F_climb,
         T_flat=B738.T_flat,
-        k_derate_to=B738.k_derate_to * scale,
-        k_derate_climb=B738.k_derate_climb * scale,
-        OEW=oew,
-        MTOW=mtow,
+        k_derate_to=F_to * DERATE_REL_TO,
+        k_derate_climb=F_climb * DERATE_REL_CLIMB,
+        OEW=r["OEW_kg"],
+        MTOW=r["MTOW_kg"],
         mu_r=B738.mu_r,
-        alpha=MAGIC_LINE_TWIN[0],
-        beta=MAGIC_LINE_TWIN[1],
+        alpha=alpha,
+        beta=beta,
     )
+    overrides = {f.name: r[f.name] for f in fields(Aircraft)
+                 if f.name != "name" and isinstance(r.get(f.name), float)}
+    return replace(ac, **overrides)
 
 
-###############################################################################
-################## Avions disponibles #########################################
-###############################################################################
-
-A319CEO = make_aircraft("A319ceo", "A319", "CFM56-5B6/P")
-A320CEO = make_aircraft("A320ceo", "A320", "CFM56-5B4/P")
-A320NEO = make_aircraft("A320neo", "A20N", "LEAP-1A26")
-A320NEO_PW = make_aircraft("A320neo", "A20N", "PW1127G-JM")
-A321CEO = make_aircraft("A321ceo", "A321", "CFM56-5B3/P")
-A321NEO = make_aircraft("A321neo", "A21N", "LEAP-1A33")
-A321NEO_PW = make_aircraft("A321neo", "A21N", "PW1133G-JM")
-B38M = make_aircraft("B737 MAX 8", "B38M", "LEAP-1B27")
-
-# B737-800 reconstruit avec la même chaîne, uniquement pour contrôler la méthode
-B738_CHECK = replace(make_aircraft("B737-800", "B738", "CFM56-7B26"),
-                     alpha=B738.alpha, beta=B738.beta)
-
-AIRCRAFT = {ac.name: ac for ac in (A319CEO, A320CEO, A320NEO, A320NEO_PW,
-                                   A321CEO, A321NEO, A321NEO_PW, B38M)}
+def flotte(noms=None, methode="direct", path=CATALOGUE):
+    """{nom: Aircraft} pour tout le catalogue, ou pour les noms donnés (recherche partielle acceptée)."""
+    cat = charger_catalogue(path)
+    if noms is not None:
+        choisis = [n for n in cat if any(q.lower() in n.lower() for q in noms)]
+        cat = {n: cat[n] for n in choisis}
+    return {n: construire_avion(r, methode) for n, r in cat.items()}
 
 
 def calibrate_beta(ac: Aircraft, mass, tofl_ref, T_celsius=15.0, h=0.0):
@@ -194,37 +211,34 @@ def calibrate_beta(ac: Aircraft, mass, tofl_ref, T_celsius=15.0, h=0.0):
 
 
 ###############################################################################
-################## Démonstration ##############################################
+################## Raccourcis (première version) ##############################
 ###############################################################################
 
+AIRCRAFT = flotte()
+
+
+def _get(prefix):
+    return next(ac for n, ac in AIRCRAFT.items() if n.startswith(prefix))
+
+
+A319CEO = _get("A319ceo")
+A320CEO = _get("A320ceo")
+A320NEO = _get("A320neo (LEAP")
+A320NEO_PW = _get("A320neo (PW")
+A321CEO = _get("A321ceo")
+A321NEO = _get("A321neo (LEAP")
+A321NEO_PW = _get("A321neo (PW")
+B38M = _get("B737 MAX 8")
+
+
 if __name__ == "__main__":
-    import warnings
-    warnings.simplefilter("ignore") # non-convergence S2 = jour infaisable, affiché "inf"
-
-    print("=== Paramètres dérivés ===")
-    print(f"{'avion':32s} {'S':>6s} {'CLmax':>6s} {'CD0':>7s} {'K':>7s} {'F_to':>7s} "
-          f"{'k_der':>6s} {'OEW':>6s} {'MTOW':>6s}")
-    for ac in (B738, B738_CHECK, *AIRCRAFT.values()):
-        print(f"{ac.name:32s} {ac.S:6.1f} {ac.C_L_max:6.3f} {ac.C_D0:7.4f} {ac.K:7.4f} "
-              f"{ac.F_to_base / 1000:6.1f}k {ac.k_derate_to:6.0f} {ac.OEW:6.0f} {ac.MTOW:6.0f}")
-
-    print("\n=== Contrôle : TOFL modèle vs distance EUROCONTROL (ISA, niveau de la mer, vent nul) ===")
-    print("    (les conditions EUROCONTROL ne sont pas publiées : ordre de grandeur seulement)")
-    codes = {B738_CHECK.name: "B738", A319CEO.name: "A319", A320CEO.name: "A320",
-             A320NEO.name: "A20N", A321CEO.name: "A321", A321NEO.name: "A21N", B38M.name: "B38M"}
-    for name, code in codes.items():
-        ac = B738_CHECK if code == "B738" else AIRCRAFT[name]
-        mass, _, tod = EUROCONTROL_APD[code]
-        r = take_off_performance(mass, 15.0, ac=ac)
-        print(f"  {name:32s} m={mass / 1000:5.1f} t : TOFL={r.TOFL:6.0f} m  (APD {tod} m, "
-              f"écart {100 * (r.TOFL / tod - 1):+5.1f} %)  {r.regime}, S2={r.s2_status}")
-
-    print("\n=== TOFL (m) à la MTOW, niveau de la mer, vent nul ===")
-    temps_isa = [0, 15, 25, 35]
-    print(f"{'avion':32s} " + " ".join(f"ISA+{d:<3d}" for d in temps_isa))
-    for ac in AIRCRAFT.values():
-        row = []
-        for d in temps_isa:
-            r = take_off_performance(ac.MTOW, 15 + d, ac=ac)
-            row.append(f"{r.TOFL:7.0f}" if r.feasible else "    inf")
-        print(f"{ac.name:32s} " + " ".join(row))
+    for methode in ("direct", "echelle"):
+        print(f"=== Paramètres, méthode '{methode}' ===")
+        print(f"{'avion':28s} {'S':>6s} {'CLmax':>6s} {'CD0':>7s} {'K':>7s} {'L/D_TO':>6s} "
+              f"{'F_to':>7s} {'MTOW':>7s}")
+        for ac in (B738, *flotte(methode=methode).values()):
+            C_L = ac.C_L_max / K_VS1G_MIN ** 2
+            ld = C_L / (ac.C_D0 + ac.K * C_L ** 2)
+            print(f"{ac.name:28s} {ac.S:6.1f} {ac.C_L_max:6.3f} {ac.C_D0:7.4f} {ac.K:7.4f} "
+                  f"{ld:6.2f} {ac.F_to_base / 1000:6.1f}k {ac.MTOW:7.0f}")
+        print()

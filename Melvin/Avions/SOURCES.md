@@ -1,150 +1,86 @@
-# Sources des paramètres avions (`avions.py`)
+# Avions du modèle Magic Line : organisation et sources
 
-Ce fichier donne l'origine de chaque paramètre des avions ajoutés au modèle Magic Line
-(`MelvinxClaudine.py`), la façon dont il a été obtenu, et le niveau de confiance.
 Consulté le 2 novembre 2026.
 
-## 1. Sources utilisées
+## 1. Fichiers du dossier
+
+| Fichier | Rôle |
+|---------|------|
+| `catalogue.csv` | Catalogue d'avions : données brutes sourcées, une ligne par avion × moteur |
+| `import_catalogue.py` | Remplit ou met à jour le catalogue depuis OpenAP, ICAO EEDB et EUROCONTROL |
+| `avions.py` | Construit les objets `Aircraft` à partir du catalogue (méthode `direct` ou `echelle`) |
+| `flotte.py` | Étude d'une flotte : TOFL, début de limitation 2e segment, température limite, figures |
+| `etude_b738.py`, `ETUDE_B737-800.md` | Étude indépendante du B737-800 et comparaison avec la thèse |
+| `figures/` | Figures générées |
+
+## 2. Ajouter des avions
+
+```bash
+python import_catalogue.py B739 E190 A332        # types OpenAP, moteur par défaut
+python import_catalogue.py A20N:PW1127G-JM        # moteur imposé
+python flotte.py A320 B737 --altitude 1600 --piste 3500 --masse 0.95
+```
+
+Types disponibles dans OpenAP (38) : A19N, A20N, A21N, A318, A319, A320, A321, A332, A333,
+A343, A359, A388, B37M, B38M, B39M, B3XM, B734, B737, B738, B739, B744, B748, B752, B763,
+B772, B773, B77W, B788, B789, C550, CRJ9, E145, E170, E190, E195, E75L, GLF6.
+Ceux qui n'ont pas de polaire reprennent celle d'un type proche (fichier `_synonym.csv`
+d'OpenAP, signalé dans la colonne `notes`).
+
+Pour **forcer une valeur connue** (donnée constructeur), ajouter au CSV une colonne portant
+le nom du champ `Aircraft` (`C_L_max`, `C_D0`, `K`, `T_flat`, `alpha`, `beta`, ...) : elle
+remplace la valeur calculée. La colonne `magic_line` accepte `twin`, `unified`, `quad`,
+`b738` ou `alpha;beta`.
+
+## 3. Sources
 
 | # | Source | Ce qu'on en tire | Lien |
 |---|--------|------------------|------|
-| [1] | Salles, S. (2025), *Vulnerability of aviation to climate change*, thèse, méthode Magic Line | Paramètres B737-800 de référence (5.5.1), méthode (5.18), corrélation bimoteur (5.19) | (thèse, non en ligne dans le dépôt) |
-| [2] | OpenAP, Open Aircraft Performance Model, TU Delft (J. Sun), fichiers `aircraft/<code>.yml` | Surface alaire, envergure, MTOW, OEW, motorisations | https://github.com/junzis/openap/tree/master/openap/data/aircraft |
-| [3] | OpenAP, fichiers `dragpolar/<code>.yml` | Polaire lisse (C_D0, K), géométrie volets (λ_f, c_f/c, S_f/S) | https://github.com/junzis/openap/tree/master/openap/data/dragpolar |
-| [4] | OpenAP, `drag.py` (`Drag.nonclean`) | Formules d'incrément de traînée volets / train, effet des volets sur K | https://github.com/junzis/openap/blob/master/openap/drag.py |
-| [5] | ICAO Aircraft Engine Emissions Databank, repris dans OpenAP `engines.csv` (colonne `max_thrust` = poussée certifiée au décollage) | Poussée de décollage par moteur | https://github.com/junzis/openap/blob/master/openap/data/engine/engines.csv · https://www.easa.europa.eu/en/domains/environment/icao-aircraft-engine-emissions-databank |
-| [6] | EUROCONTROL Aircraft Performance Database | V2 (IAS), distance de décollage, masse associée | https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/ (pages `details.aspx?ICAO=A319`, `A320`, `A20N`, `A321`, `A21N`, `B38M`, `B738`) |
-| [7] | JCAB, TADS No. 778 (LEAP-1A) | Température de flat-rating au décollage du LEAP-1A : 86 °F (30 °C) | https://asims.cab.mlit.go.jp/fsdb/a_katashiki.nsf/8344a61f244404e6492574eb003898d6/6204c93856eaded3492584860025d5ef/%24FILE/TADS_No.778_%28LEAP-1A%29.pdf |
+| [1] | Salles, S. (2025), *Vulnerability of aviation to climate change*, thèse | B737-800 de référence (5.5.1), méthode (5.18), droites Magic Line (5.19), rapports de poussée | – |
+| [2] | OpenAP, TU Delft (J. Sun), `aircraft/<code>.yml` | S, envergure, MTOW, OEW, moteurs, montage | https://github.com/junzis/openap/tree/master/openap/data/aircraft |
+| [3] | OpenAP, `dragpolar/<code>.yml` et `_synonym.csv` | C_D0 et K lisses, géométrie des volets | https://github.com/junzis/openap/tree/master/openap/data/dragpolar |
+| [4] | OpenAP, `drag.py` (`Drag.nonclean`) | Formules volets (McCormick 1994), train (Mair & Birdsall 1996), effet des volets sur K (Obert 2009) | https://github.com/junzis/openap/blob/master/openap/drag.py |
+| [5] | ICAO Aircraft Engine Emissions Databank, via OpenAP `engines.csv` | Poussée certifiée au décollage (`max_thrust`), taux de dilution (`bpr`) | https://github.com/junzis/openap/blob/master/openap/data/engine/engines.csv · https://www.easa.europa.eu/en/domains/environment/icao-aircraft-engine-emissions-databank |
+| [6] | EUROCONTROL Aircraft Performance Database | V2 (IAS), distance de décollage, masse associée | https://learningzone.eurocontrol.int/ilp/customs/ATCPFDB/details.aspx?ICAO=A320 (remplacer le code) |
+| [7] | JCAB, TADS No. 778 (LEAP-1A) | Flat-rating décollage du LEAP-1A : 30 °C | https://asims.cab.mlit.go.jp/fsdb/a_katashiki.nsf/8344a61f244404e6492574eb003898d6/6204c93856eaded3492584860025d5ef/%24FILE/TADS_No.778_%28LEAP-1A%29.pdf |
+| [8] | Aircraft Commerce n° 145 (2023), article maintenance | Diamètres de soufflante CFM56-5B (68.3 in), CFM56-7B (61 in), LEAP-1A (78 in), LEAP-1B (69.4 in) | https://aircraft-commerce.com/wp-content/uploads/aircraft-commerce-docs/General%20Articles/2023/145_MTCE_A.pdf |
+| [9] | Torenbeek, E. (1982), *Synthesis of Subsonic Airplane Design*, Delft University Press | Formule semi-empirique de longueur de piste équilibrée (contrôle indépendant) | – |
+| [10] | Raymer, D. (2018), *Aircraft Design: A Conceptual Approach*, AIAA | Traînée de moulinet d'un moteur en panne, D/q ≈ 0.3 × aire de la soufflante (ordre de grandeur) | – |
 
-Références citées par OpenAP pour les formules de [4] : McCormick (1994), *Aerodynamics,
-Aeronautics and Flight Mechanics*, p. 109 (traînée des volets) ; Mair & Birdsall (1996),
-*Aircraft Performance*, éq. 6.1 (traînée du train) ; Obert (2009), *Aerodynamic Design of
-Transport Aircraft*, fig. 27.39 (effet des volets sur le facteur d'Oswald).
+Le diamètre de soufflante du PW1100G (81 in) est une valeur constructeur couramment citée,
+non vérifiée sur une source primaire. Pour les autres moteurs (CF34, Trent), le diamètre
+n'est pas renseigné et une traînée de moulinet par défaut (ΔC_D0 = 0.005) est utilisée.
 
-## 2. Données brutes retenues
+## 4. Construction des paramètres
 
-### Géométrie, masses, polaire lisse : OpenAP [2], [3]
+| Paramètre `Aircraft` | Méthode `direct` (défaut) | Méthode `echelle` | Confiance |
+|----------------------|---------------------------|-------------------|-----------|
+| `S`, `OEW`, `MTOW` | OpenAP [2] | idem | Bonne |
+| `F_to_base` | ICAO EEDB [5] | idem | Bonne (valeur certifiée) |
+| `C_L_max` | (5.18) : 2 m g / (ρ0 S (V2/1.13)²), m et V2 EUROCONTROL [6] | idem | Faible à moyenne (V2 arrondis) |
+| `C_D0` | 2e segment : lisse + volets + moteur en panne [3][4][10] | C_D0 thèse × rapport OpenAP (avion / B737-800) | Moyenne / reprend la thèse |
+| `K` | K lisse corrigé des volets [3][4] | K thèse × rapport OpenAP | Moyenne |
+| `F_climb_base` | F_to × 112/117 [1] | idem | Hypothèse |
+| `k_derate_to`, `k_derate_climb` | F × 0.77 %/°C (TO) et 0.76 %/°C (montée) [1] | idem | Hypothèse, sensible (voir étude) |
+| `T_flat` | ISA+15 [1], confirmé pour le LEAP-1A [7] | idem | Hypothèse sauf LEAP-1A |
+| `mu_r` | 0.02 [1] | idem | Bonne (piste sèche) |
+| `alpha`, `beta` | droite de la colonne `magic_line`, par défaut bimoteur (32.44, −347.40) [1] | idem | Voir ci-dessous |
 
-| Code | Avion | S (m²) | Envergure (m) | MTOW (kg) | OEW (kg) | C_D0 lisse | K lisse | c_f/c | S_f/S |
-|------|-------|-------:|--------------:|----------:|---------:|-----------:|--------:|------:|------:|
-| B738 | B737-800 (contrôle) | 124.6 | 34.32 | 79 000 | 41 400 | 0.019 | 0.042 | 0.150 | 0.150 |
-| A319 | A319ceo | 124.0 | 35.80 | 75 500 | 40 800 | 0.020 | 0.039 | 0.176 | 0.170 |
-| A320 | A320ceo | 124.0 | 35.80 | 78 000 | 42 600 | 0.018 | 0.039 | 0.176 | 0.170 |
-| A20N | A320neo | 124.0 | 35.80 | 79 000 | 44 300 | 0.017 | 0.038 | 0.176 | 0.170 |
-| A321 | A321ceo | 128.0 | 35.80 | 93 500 | 48 500 | 0.020 | 0.041 | 0.176 | 0.165 |
-| A21N | A321neo | 128.0 | 35.80 | 97 000 | 50 000 | 0.017* | 0.038* | 0.176 | 0.170 |
-| B38M | B737 MAX 8 | 124.6 | 34.32 | 82 000 | 45 000 | 0.020 | 0.042 | 0.150 | 0.150 |
+Seul le produit S·C_L,max entre dans V_LOF et F_TOL. Comme C_L,max est reconstruit avec le
+même S, le choix de la surface de référence n'a pas d'effet sur la TOFL.
 
-\* OpenAP n'a pas de fichier `dragpolar/a21n.yml` : le fichier avion A321neo reprend la polaire A320neo (annotée `#a20n`).
-λ_f = 0.900 pour tous les avions.
+## 5. Limites connues
 
-### Poussée de décollage certifiée : ICAO EEDB [5]
-
-| Avion | Moteur | Entrée ICAO | Poussée (N) |
-|-------|--------|-------------|------------:|
-| B737-800 (contrôle) | CFM56-7B26 | 8CM051 | 116 990 |
-| A319ceo | CFM56-5B6/P | 3CM028 | 104 530 |
-| A320ceo | CFM56-5B4/P | 2CM014 (CFM56-5B4) | 117 900 |
-| A320neo | LEAP-1A26 | 20CM089 (LEAP-1A26/26E1) | 120 600 |
-| A320neo (variante) | PW1127G-JM | 18PW122 | 120 430 |
-| A321ceo | CFM56-5B3/P | 3CM025 | 142 350 |
-| A321neo | LEAP-1A33 | 20CM090 (LEAP-1A35A/33/33B2/32/30, entrée groupée) | 143 100 |
-| A321neo (variante) | PW1133G-JM | 18PW126 | 147 280 |
-| B737 MAX 8 | LEAP-1B27 | 20CM098 | 124 700 |
-
-Moteurs par défaut : ceux d'OpenAP pour l'A320ceo (A320-214) et l'A320neo/A321neo
-(LEAP-1A) ; CFM56-5B6 (A319-112) et CFM56-5B3 (A321-211) pour l'A319 et l'A321ceo, plutôt
-que les IAE V2500 donnés par défaut dans OpenAP, pour rester sur des moteurs CFM comme le
-B737-800 de la thèse.
-
-### Données de décollage : EUROCONTROL APD [6]
-
-| Code | Masse (kg) | V2 (kt IAS) | Distance de décollage (m) |
-|------|-----------:|------------:|--------------------------:|
-| B738 | 70 530 | 145 | 2 300 |
-| A319 | 64 000 | 135 | 1 750 |
-| A320 | 73 900 | 145 | 2 190 |
-| A20N | 79 000 | 145 | 1 951 |
-| A321 | 83 000 | 145 | 2 210 |
-| A21N | 97 000 | 145 | 2 150 |
-| B38M | 82 600 | 145 | 2 500 |
-
-EUROCONTROL précise : *« All data presented is only indicative and should not be used
-operationally. »* Les conditions (température, altitude, volets) ne sont pas indiquées.
-
-## 3. Paramètres dérivés et méthode
-
-| Paramètre `Aircraft` | Méthode | Confiance |
-|----------------------|---------|-----------|
-| `S`, `OEW`, `MTOW` | OpenAP [2], tels quels | Bonne |
-| `F_to_base` | ICAO EEDB [5], tel quel | Bonne (valeur certifiée) |
-| `F_climb_base` | `F_to_base × 112 000 / 117 000` (ratio du B737-800 de la thèse [1]) | Moyenne (hypothèse) |
-| `k_derate_to`, `k_derate_climb` | `k_B738 × F_base / 117 000` : même pente relative (≈ 0.77 %/°C) que la thèse | Moyenne (hypothèse) |
-| `T_flat` | 15 °C (ISA+15), comme la thèse ; confirmé pour le LEAP-1A (30 °C au niveau de la mer [7]) | Bonne pour LEAP-1A, hypothèse pour les autres |
-| `C_L_max` | Méthode de la thèse (5.18) : `C_L,max = 2 m g / (ρ0 S (V2/1.13)²)` avec m et V2 d'EUROCONTROL [6] | Faible à moyenne (V2 arrondis à 135/145 kt) |
-| `C_D0`, `K` | Similitude avec le B737-800 de la thèse : `X = X_B738,thèse × X_OpenAP(avion) / X_OpenAP(B738)`, avec X_OpenAP la polaire de décollage calculée par les formules de [4] (volets 5° pour les Boeing, 10° = CONF 1+F pour les Airbus, train sorti) | Moyenne |
-| `mu_r` | 0.02, comme la thèse | Bonne (piste sèche) |
-| `alpha`, `beta` | Corrélation bimoteur de la thèse `MAGIC_LINE_TWIN = (32.44, −347.40)` [1] | Voir § 4 |
-
-Valeurs obtenues (sortie de `python avions.py`) :
-
-| Avion | C_L,max | C_D0 | K | F_to (kN) | k_derate,TO (N/°C) |
-|-------|--------:|-----:|--:|----------:|-------------------:|
-| A319ceo (CFM56-5B6/P) | 2.188 | 0.0798 | 0.0334 | 104.5 | 804 |
-| A320ceo (CFM56-5B4/P) | 2.190 | 0.0764 | 0.0334 | 117.9 | 907 |
-| A320neo (LEAP-1A26) | 2.341 | 0.0746 | 0.0326 | 120.6 | 928 |
-| A320neo (PW1127G-JM) | 2.341 | 0.0746 | 0.0326 | 120.4 | 926 |
-| A321ceo (CFM56-5B3/P) | 2.382 | 0.0850 | 0.0351 | 142.3 | 1095 |
-| A321neo (LEAP-1A33) | 2.784 | 0.0798 | 0.0326 | 143.1 | 1101 |
-| A321neo (PW1133G-JM) | 2.784 | 0.0798 | 0.0326 | 147.3 | 1133 |
-| B737 MAX 8 (LEAP-1B27) | 2.436 | 0.0812 | 0.0366 | 124.7 | 959 |
-
-### Pourquoi la surface alaire importe peu
-
-Seul le produit S·C_L,max intervient dans V_LOF et F_TOL. Comme C_L,max est reconstruit par
-(5.18) avec le même S, prendre 124 m² (OpenAP) ou 122.6 m² (valeur souvent citée par Airbus
-pour l'A320) donne la même TOFL.
-
-## 4. Validation et limites
-
-**Contrôle de la méthode sur le B737-800.** La même chaîne appliquée au B737-800 redonne
-les valeurs de la thèse :
-- C_L,max = 2.08 par (5.18) + EUROCONTROL, contre 2.10 dans la thèse ;
-- poussée ICAO du CFM56-7B26 = 116.99 kN, contre 117 kN dans la thèse ;
-- TOFL modèle à 70.5 t, ISA, niveau de la mer = 2 311 m, contre 2 300 m chez EUROCONTROL (+0.5 %).
-
-**Comparaison aux distances EUROCONTROL (ISA, niveau de la mer, vent nul).**
-
-| Avion | Masse (t) | TOFL modèle (m) | EUROCONTROL (m) | Écart |
-|-------|----------:|----------------:|----------------:|------:|
-| A319ceo | 64.0 | 2 132 | 1 750 | +21.8 % |
-| A320ceo | 73.9 | 2 581 | 2 190 | +17.8 % |
-| A320neo | 79.0 | 2 713 | 1 951 | +39.0 % |
-| A321ceo | 83.0 | 2 377 | 2 210 | +7.5 % |
-| A321neo | 97.0 | 2 819 | 2 150 | +31.1 % |
-| B737 MAX 8 | 82.6 | 2 747 | 2 500 | +9.9 % |
-
-Le modèle surestime la longueur de décollage des Airbus, surtout des neo. Causes probables :
-1. **Corrélation générique.** La droite bimoteur de la thèse (σ = 185 m sur 29 avions) n'est
-   pas calée sur chaque type ; le B737-800 a sa propre droite (30.34, −323).
-2. **V2 EUROCONTROL arrondis.** Tous les avions sauf l'A319 ont V2 = 145 kt, quelle que soit la
-   masse, ce qui rend le C_L,max reconstruit peu fiable (2.78 pour l'A321neo paraît élevé).
-3. **Conditions EUROCONTROL inconnues.** On ne sait pas si la distance est donnée à la MTOW, à
-   ISA, au niveau de la mer, ni avec quels volets.
-
-**Recalage proposé.** `calibrate_beta(ac, masse, tofl_ref)` recale β (α gardé) sur une TOFL de
-référence dont les conditions sont connues. Les meilleures références sont les abaques
-« take-off weight / field length » (ISA et ISA+15, niveau de la mer) des documents Airbus
-*Aircraft Characteristics – Airport and Maintenance Planning* (AC A319, A320, A321) :
-https://aircraft.airbus.com/en/customer-care/fleet-wide-care/airport-operations-and-aircraft-characteristics/aircraft-characteristics
-Ces abaques sont des graphiques vectoriels : leurs valeurs n'ont pas pu être extraites
-automatiquement et doivent être lues à la main.
-
-**Sources consultées mais non exploitées.**
-- Fiches de certification EASA (TCDS E.067 CFM56-5, E.110 LEAP-1A) : les liens trouvés
-  pointaient vers d'autres documents (Special Condition TOTHAT) ou n'étaient pas lisibles.
-  La poussée certifiée vient donc de la base ICAO, qui reprend les valeurs certifiées.
-- Documents Boeing *Airplane Characteristics for Airport Planning* (737 NG / 737 MAX) :
-  liens morts (HTTP 404).
-- Tableaux de caractéristiques sur des sites agrégateurs (Skybrary, aerocorner, etc.) :
-  valeurs de distance de décollage contradictoires et sans conditions, donc écartés.
+- **V2 EUROCONTROL.** Valeurs indicatives (« should not be used operationally »), arrondies
+  (145 kt pour presque tous les monocouloirs, quelle que soit la masse), sans conditions
+  indiquées. Le C_L,max reconstruit est la donnée la plus fragile. Exemple : le B787-8 sort à
+  C_L,max = 1.72 et à une TOFL irréaliste (4 800 m à la MTOW).
+- **Droite Magic Line.** La droite bimoteur générique (σ = 185 m sur 29 avions) n'est calée sur
+  aucun type. `calibrate_beta(ac, masse, tofl_ref)` (dans `avions.py`) recale β sur une TOFL
+  constructeur dont les conditions sont connues. Les références à utiliser sont les abaques
+  « take-off weight / field length » des documents Airbus *Aircraft Characteristics – Airport
+  and Maintenance Planning* et Boeing *Airplane Characteristics for Airport Planning* :
+  https://aircraft.airbus.com/en/customer-care/fleet-wide-care/airport-operations-and-aircraft-characteristics/aircraft-characteristics
+- **Sources consultées non exploitées.** Fiches de certification EASA (liens incorrects ou PDF
+  illisibles), documents Boeing d'aéroport (HTTP 404), sites agrégateurs (valeurs
+  contradictoires, sans conditions).
