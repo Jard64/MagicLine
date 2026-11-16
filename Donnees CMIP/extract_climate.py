@@ -15,6 +15,7 @@ Sorties :
 import pandas as pd
 import xarray as xr
 from matplotlib import pyplot as plt
+from airports_data import AIRPORTS
 
 # ---------------------------------------------------------------------------
 # Paramètres
@@ -22,10 +23,11 @@ from matplotlib import pyplot as plt
 MODEL = 'CNRM-CM6-1'
 MEMBER = 'r1i1p1f2'
 SCENARIOS = ['ssp245'] #, 'ssp585']   # scénario intermédiaire et scénario fort
-VARIABLE = 'tas'                   # température de l'air près de la surface (K)
+VARIABLE = 'tasmax'                   # température de l'air près de la surface (K)
 TABLE = 'Amon'                      # 'day' = journalier, 'Amon' = mensuel (plus léger)
 
-LAT, LON = 48.85, 2.35             # Paris
+
+LAT, LON = AIRPORTS['CDG']['lat'], AIRPORTS['CDG']['lon']            # Paris
 START, END = '2030', '2060'
 
 CATALOG_URL = 'https://storage.googleapis.com/cmip6/cmip6-zarr-consolidated-stores.csv'
@@ -48,7 +50,7 @@ def find_store(catalog, scenario):
 
 
 def extract_point(zstore):
-    """Ouvre le jeu de données, garde le point de grille le plus proche de Paris
+    """Ouvre le jeu de données, garde le point de grille le plus proche
     et la période voulue, puis convertit en °C."""
     ds = xr.open_zarr(zstore, consolidated=True, storage_options={'token': 'anon'})
     serie = (
