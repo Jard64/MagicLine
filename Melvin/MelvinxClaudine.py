@@ -515,9 +515,12 @@ def take_off_performance(mass, T_celsius, h=0.0, headwind=0.0, ac: Aircraft = B7
     F_TOL = magic_line_parameter(ac, mass, rho, s2.C_L_TO, F_to)
     tofl0 = take_off_field_length(F_TOL, ac.alpha, ac.beta)
 
-    # 5. Wind
+    tofl = tofl0
     V_LOF = lift_off_speed(ac, mass, rho, s2.C_L_TO)
-    tofl = tofl0 * wind_factor(V_LOF, headwind)
+    # On décide de supprimer le vent
+    # # 5. Wind
+    # V_LOF = lift_off_speed(ac, mass, rho, s2.C_L_TO)
+    # tofl = tofl0 * wind_factor(V_LOF, headwind)
 
     regime = "S2-limited" if s2.status == "converged" else thrust_regime(ac, dT)
     return TakeOffResult(
