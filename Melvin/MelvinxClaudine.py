@@ -297,17 +297,13 @@ def ground_roll_exact(ac: Aircraft, mass, rho, thrust_total, C_L, V_LOF):
     (poussée supposée constante avec la vitesse)
     """
     W = mass * G0
-    # A = thrust_total - ac.mu_r * W
-    # B = 0.5 * rho * ac.S * (drag_coefficient(ac, C_L) - ac.mu_r * C_L)
-    q = 0.5 * rho * V_LOF**2
-    gamma = (thrust_total - q*ac.S*drag_coefficient(ac, C_L) - ac.mu_r*(W - q*ac.S*C_L))/W
-    return W/(2*G0) * gamma
-    # Proposition initiale (pas présent dans la thèse)
-    # if A <= 0 or A - B * V_LOF ** 2 <= 0:
-    #     raise ValueError("Negative value for ground roll")
-    # if abs(B) < 1e-12:
-    #     return mass * V_LOF ** 2 / (2 * A)
-    # return mass / (2 * B) * math.log(A / (A - B * V_LOF ** 2))
+    A = thrust_total - ac.mu_r * W
+    B = 0.5 * rho * ac.S * (drag_coefficient(ac, C_L) - ac.mu_r * C_L)
+    if A <= 0 or A - B * V_LOF ** 2 <= 0:
+        raise ValueError("Negative value for ground roll")
+    if abs(B) < 1e-12:
+        return mass * V_LOF ** 2 / (2 * A)
+    return mass / (2 * B) * math.log(A / (A - B * V_LOF ** 2))
 
 
 def ground_roll_constant_accel(ac: Aircraft, mass, rho, thrust_total, C_L, V_LOF, frac=0.85):
@@ -763,7 +759,7 @@ def flex_impact_scores(baseline, future, days_per_year=365):
 
 ###############################################################################
 ################## Démonstration ##############################################
-###############################################################################
+##############################################################################
 
 if __name__ == "__main__":
     print("=== B737-800, TOFL (m) vs masse et écart ISA, niveau de la mer, vent nul ===")
