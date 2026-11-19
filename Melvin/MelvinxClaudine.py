@@ -464,6 +464,7 @@ def certified_take_off_length(tol_aeo, tol_oei_bfl):
 
 ###############################################################################
 ################## PARTIE B10 - Modèle complet (Fig. 5.3) #####################
+#################################### OK #######################################
 ###############################################################################
 
 @dataclass
@@ -668,6 +669,7 @@ P_DECADAL_EXTREME = 100 * (1 - 1 / 3652.5) # 99.9726
 
 ###############################################################################
 ################## PARTIE C - Vulnérabilité des aéroports (chap. 7) ###########
+######################################## Ok ###################################
 ###############################################################################
 
 def is_inoperable(result: TakeOffResult, runway_length):
@@ -752,6 +754,17 @@ def flex_impact_scores(baseline, future, days_per_year=365):
     days_lost = availability_loss / 100 * days_per_year
     return {"composite": 0.7 * availability_loss + 0.3 * capability_loss,
             "economic": days_lost + 0.5 * capability_loss}
+
+
+
+
+"""
+Relire partie: 
+B8/B9: pourquoi pas de 3e régime ?
+A3/A4: utile ?
+A5: rien compris
+A6/A7: pertinent ?
+"""
 
 
 ###############################################################################
