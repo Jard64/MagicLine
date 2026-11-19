@@ -79,6 +79,14 @@ TOL_AEO_FACTOR = 1.15 # safety factor on all-engines take-off length (5.4)
 GAMMA_S2_MIN = {2: 0.024, 3: 0.027, 4: 0.030} # min 2nd segment gradient by engine count (5.3.4)
 
 """ Corrélation Magic Line (5.19) et calibrations """
+########################################################
+# Différents coefficients pour chaque Type d'avion #####
+# Soit à recalculer ####################################
+# Soit utiliser les TWIN, QUAD pour 2 ou 4 moteurs #####
+# Soit utiliser UNIFIED ################################
+# Voir 5.4.2.2 #########################################
+# A recalculer avec fit_magic_line() ###################
+########################################################
 
 MAGIC_LINE_UNIFIED = (29.41, -10.50) # (alpha, beta) 29 aircraft, R²=0.77, σ=185 m
 MAGIC_LINE_TWIN = (32.44, -347.40) # twin-engine fit
@@ -232,21 +240,12 @@ def engine_thrust(ac: Aircraft, delta_T_isa, h=0.0, rating="takeoff", alt_correc
 
 ###############################################################################
 ################## PARTIE B4 - Physique du roulage (5.3.3) ####################
+##################################### OK ######################################
 ###############################################################################
 
 def drag_coefficient(ac: Aircraft, C_L):
     """Polaire parabolique C_D = C_D0 + K·C_L² - (5.7) / (5.39)."""
     return ac.C_D0 + ac.K * C_L ** 2
-
-
-def lift_to_drag(ac: Aircraft, C_L):
-    """Finesse L/D = C_L / C_D - (5.40)."""
-    return C_L / drag_coefficient(ac, C_L)
-
-
-def C_L_optimal(ac: Aircraft):
-    """C_L de finesse maximale, sqrt(C_D0/K) - (6.3). Plafond de l'optimisation S2 (6.6.1)."""
-    return math.sqrt(ac.C_D0 / ac.K)
 
 
 def take_off_lift_coefficient(ac: Aircraft, K_vs1g=K_VS1G_MIN):
@@ -304,7 +303,16 @@ def ground_roll_constant_accel(ac: Aircraft, mass, rho, thrust_total, C_L, V_LOF
 
 ###############################################################################
 ################## PARTIE B5 - Contrainte de 2e segment (5.3.4, 5.5.4) ########
+##################################### OK ######################################
 ###############################################################################
+
+def lift_to_drag(ac: Aircraft, C_L):
+    """Finesse L/D = C_L / C_D - (5.40)."""
+    return C_L / drag_coefficient(ac, C_L)
+
+def C_L_optimal(ac: Aircraft):
+    """C_L de finesse maximale, sqrt(C_D0/K) - (6.3). Plafond de l'optimisation S2 (6.6.1)."""
+    return math.sqrt(ac.C_D0 / ac.K)
 
 def climb_gradient_s2(ac: Aircraft, mass, F_climb, C_L):
     """Pente de montée moteur en panne - (5.14) / (5.41).
@@ -312,7 +320,6 @@ def climb_gradient_s2(ac: Aircraft, mass, F_climb, C_L):
     γ_S2 = (N-1)·F / W - 1/(L/D)
     """
     return (ac.n_engines - 1) * F_climb / (mass * G0) - 1 / lift_to_drag(ac, C_L)
-
 
 @dataclass
 class S2Result:
@@ -329,7 +336,7 @@ def solve_second_segment(ac: Aircraft, mass, F_climb,
 
     K^(n+1) = K^(n) + α_step·|Δγ|   (5.43)
 
-    Comme C_L,climb = C_L,TO (5.38), γ_S2 ne dépend pas de ρ : seule la poussée
+    Comme C_L,climb = C_L,TO (5.38), γ_S2 ne dépend pas de ρ et V2 : seule la poussée
     transmet l'effet de la température (origine du biais d'altitude, 6.6 / 6.8.2).
     Si C_L,TO passe sous sqrt(C_D0/K), augmenter K dégrade L/D : opération infaisable.
     """
@@ -361,6 +368,7 @@ def solve_second_segment(ac: Aircraft, mass, F_climb,
 
 ###############################################################################
 ################## PARTIE B6 - Paramètre Magic Line (5.4) #####################
+####################################### OK ####################################
 ###############################################################################
 
 def magic_line_parameter(ac: Aircraft, mass, rho, C_L_TO, F_to):
@@ -626,21 +634,21 @@ def validation_stats(reference, values):
 ################## PARTIE A6 / A7 - Ensemble et seuil (3.3.4, 4.1.1) ##########
 ###############################################################################
 
-def ensemble_mean(results_by_model):
-    """Moyenne 'un modèle, une voix' - (3.4).
+# def ensemble_mean(results_by_model):
+#     """Moyenne 'un modèle, une voix' - (3.4).
 
-    results_by_model : {modèle: [membre_1, membre_2, ...]} (scalaires ou tableaux)
-    X_ens = 1/N_models Σ_i ( 1/N_members,i Σ_j X_ij )
-    """
-    return np.mean([np.mean(np.asarray(members, float), axis=0)
-                    for members in results_by_model.values()], axis=0)
+#     results_by_model : {modèle: [membre_1, membre_2, ...]} (scalaires ou tableaux)
+#     X_ens = 1/N_models Σ_i ( 1/N_members,i Σ_j X_ij )
+#     """
+#     return np.mean([np.mean(np.asarray(members, float), axis=0)
+#                     for members in results_by_model.values()], axis=0)
 
 
-def ensemble_weights(results_by_model):
-    """Poids par membre (1 / (N_models · N_members,i)) pour statistiques pondérées (percentiles...)."""
-    n_models = len(results_by_model)
-    return {model: [1 / (n_models * len(members))] * len(members)
-            for model, members in results_by_model.items()}
+# def ensemble_weights(results_by_model):
+#     """Poids par membre (1 / (N_models · N_members,i)) pour statistiques pondérées (percentiles...)."""
+#     n_models = len(results_by_model)
+#     return {model: [1 / (n_models * len(members))] * len(members)
+#             for model, members in results_by_model.items()}
 
 
 def thermal_threshold(h):
@@ -710,7 +718,7 @@ def flex_capability(mass, T_celsius, h, headwind, runway_length, ac: Aircraft = 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         for r in np.arange(step, max_reduction + 1e-9, step):
-            res = take_off_performance(mass, T_celsius, h, headwind, ac, thrust_factor=1 - r, **kwargs)
+            res = take_off_performance(mass, T_celsius, h, ac, thrust_factor=1 - r, **kwargs)
             if is_inoperable(res, runway_length):
                 break
             best = r
@@ -724,7 +732,7 @@ def flex_metrics(capabilities_percent):
     capability (%)   = réduction moyenne quand le flex est possible
     effective (%)    = availability × capability / 100
     """
-    c = np.asarray(capabilities_percent, float)
+    c = np.asarray(capabilities_percent, float) # - ? - 
     available = c > 0
     availability = 100 * available.mean()
     capability = c[available].mean() if available.any() else 0.0
@@ -750,6 +758,7 @@ def flex_impact_scores(baseline, future, days_per_year=365):
 ################## Démonstration ##############################################
 ##############################################################################
 
+
 if __name__ == "__main__":
     print("=== B737-800, TOFL (m) vs masse et écart ISA, niveau de la mer, vent nul ===")
     temps_isa = [0, 15, 25, 35]
@@ -761,8 +770,8 @@ if __name__ == "__main__":
             row.append(f"{r.TOFL:6.0f}" if r.feasible else "  inf ")
         print(f"   {mass / 1000:4.0f}   | " + " | ".join(row))
 
-    print("\n=== Détail à 75 t, Delhi (237 m), 45 °C, 5 m/s de vent de face ===")
-    r = take_off_performance(75000, 45.0, h=237, headwind=5.0)
+    print("\n=== Détail à 75 t, Delhi (237 m), 45 °C ===")
+    r = take_off_performance(75000, 45.0, h=237)
     for k, v in r.__dict__.items():
         print(f"  {k:12s} = {v:.4g}" if isinstance(v, float) else f"  {k:12s} = {v}")
     print(f"  dTOFL/dT    = {dTOFL_dT(B738, r.F_TOL, 45 + KELVIN, r.delta_T_isa, r.F_to):.1f} m/°C")
