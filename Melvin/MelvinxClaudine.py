@@ -136,6 +136,7 @@ B738_FLAPS_15 = replace(B738, name="B737-800 flaps 15", C_L_max=2.875, C_D0=0.09
 
 ###############################################################################
 ################## PARTIE B2 - Atmosphère ISA (5.5.2) #########################
+##################################### OK ######################################
 ###############################################################################
 
 def _check_altitude(h):
@@ -175,21 +176,6 @@ def density(h, T_kelvin, humidity_correction=True):
     """
     c = C_RHO if humidity_correction else 1.0
     return RHO_0 * (pressure(h) / P0) * (T0 / T_kelvin) * c
-
-
-###############################################################################
-################## PARTIE A1 - Gaz parfait et altitude-densité (3.2.1) ########
-###############################################################################
-
-def density_ideal_gas(p, T_kelvin):
-    """Loi des gaz parfaits ρ = p / (R·T) - (3.1)."""
-    return p / (R * T_kelvin)
-
-
-def density_altitude(h, T_celsius):
-    """Altitude-densité en m - (3.2) : h_ρ = h + (T - T_ISA(h)) / Γ_ρ, Γ_ρ ≈ 27.6 °C/km."""
-    return h + delta_isa(h, T_celsius) / GAMMA_RHO
-
 
 ###############################################################################
 ################## PARTIE B3 - Poussée (5.4.3, 5.5.3) #########################
@@ -406,43 +392,43 @@ def C_L_max_from_V2(mass, V2, S, rho=RHO_0):
     return 2 * mass * G0 / (rho * V_stall ** 2 * S)
 
 
-###############################################################################
-################## PARTIE A2 / B7 - Vent (3.2.2.1, 5.5.5) #####################
-###############################################################################
+# ###############################################################################
+# ################## PARTIE A2 / B7 - Vent (3.2.2.1, 5.5.5) #####################
+# ###############################################################################
 
-def wind_components(u, v, runway_heading_deg):
-    """Composantes vent de face / travers pour un cap de piste ψ (° depuis le nord, horaire).
+# def wind_components(u, v, runway_heading_deg):
+#     """Composantes vent de face / travers pour un cap de piste ψ (° depuis le nord, horaire).
 
-    u : vent vers l'est (m/s), v : vent vers le nord (m/s).
-    headwind  = -(u sin ψ + v cos ψ)  (> 0 : vent de face)
-    crosswind =   u cos ψ - v sin ψ   (> 0 : vent venant de la gauche)
-    (cf. remarque en tête de fichier sur (3.3) / (5.49) / (5.50))
-    """
-    psi = np.radians(runway_heading_deg)
-    headwind = -(u * np.sin(psi) + v * np.cos(psi))
-    crosswind = u * np.cos(psi) - v * np.sin(psi)
-    return headwind, crosswind
-
-
-def optimal_runway_heading(u_hist, v_hist, candidate_headings):
-    """Cap retenu pour une piste : celui qui maximise le vent de face moyen historique
-    (1980-2010), puis figé pour les scénarios futurs (3.2.2.1)."""
-    means = [np.mean(wind_components(u_hist, v_hist, h)[0]) for h in candidate_headings]
-    return candidate_headings[int(np.argmax(means))]
+#     u : vent vers l'est (m/s), v : vent vers le nord (m/s).
+#     headwind  = -(u sin ψ + v cos ψ)  (> 0 : vent de face)
+#     crosswind =   u cos ψ - v sin ψ   (> 0 : vent venant de la gauche)
+#     (cf. remarque en tête de fichier sur (3.3) / (5.49) / (5.50))
+#     """
+#     psi = np.radians(runway_heading_deg)
+#     headwind = -(u * np.sin(psi) + v * np.cos(psi))
+#     crosswind = u * np.cos(psi) - v * np.sin(psi)
+#     return headwind, crosswind
 
 
-def wind_factor(V_LOF, headwind):
-    """TOFL_vent / TOFL_sans_vent = ((V_LOF - V_hw) / V_LOF)² - (5.48), (5.52).
-
-    La vitesse air de décollage est fixe, c'est la vitesse sol (donc l'énergie
-    cinétique à fournir) qui change : V_air = V_sol + V_hw (5.47).
-    """
-    return ((V_LOF - headwind) / V_LOF) ** 2
+# def optimal_runway_heading(u_hist, v_hist, candidate_headings):
+#     """Cap retenu pour une piste : celui qui maximise le vent de face moyen historique
+#     (1980-2010), puis figé pour les scénarios futurs (3.2.2.1)."""
+#     means = [np.mean(wind_components(u_hist, v_hist, h)[0]) for h in candidate_headings]
+#     return candidate_headings[int(np.argmax(means))]
 
 
-def lift_off_speed_scaled(V_LOF_ref, mass, mass_ref, rho, rho_ref=RHO_0):
-    """V_LOF = V_LOF,ref · sqrt(W/W_ref) · sqrt(ρ_SL/ρ) - (5.51)."""
-    return V_LOF_ref * math.sqrt(mass / mass_ref) * math.sqrt(rho_ref / rho)
+# def wind_factor(V_LOF, headwind):
+#     """TOFL_vent / TOFL_sans_vent = ((V_LOF - V_hw) / V_LOF)² - (5.48), (5.52).
+
+#     La vitesse air de décollage est fixe, c'est la vitesse sol (donc l'énergie
+#     cinétique à fournir) qui change : V_air = V_sol + V_hw (5.47).
+#     """
+#     return ((V_LOF - headwind) / V_LOF) ** 2
+
+
+# def lift_off_speed_scaled(V_LOF_ref, mass, mass_ref, rho, rho_ref=RHO_0):
+#     """V_LOF = V_LOF,ref · sqrt(W/W_ref) · sqrt(ρ_SL/ρ) - (5.51)."""
+#     return V_LOF_ref * math.sqrt(mass / mass_ref) * math.sqrt(rho_ref / rho)
 
 
 ###############################################################################
@@ -490,7 +476,7 @@ class TakeOffResult:
     feasible: bool
 
 
-def take_off_performance(mass, T_celsius, h=0.0, headwind=0.0, ac: Aircraft = B738,
+def take_off_performance(mass, T_celsius, h=0.0, ac: Aircraft = B738,
                          thrust_factor=1.0, s2_thrust="takeoff", alt_correction="none"):
     """Modèle Magic Line complet pour une condition (masse kg, T °C, altitude m, vent m/s).
 
@@ -688,8 +674,8 @@ def inoperable_days(T_max_celsius, u, v, runway_length, runway_heading, h,
     with warnings.catch_warnings():
         warnings.simplefilter("ignore") # non-convergence = infeasible day, already counted
         for T, uu, vv in zip(T_max_celsius, u, v):
-            hw, _ = wind_components(uu, vv, runway_heading)
-            r = take_off_performance(mass, T, h, hw, ac, **kwargs)
+            # hw, _ = wind_components(uu, vv, runway_heading)
+            r = take_off_performance(mass, T, h, ac, **kwargs)
             count += is_inoperable(r, runway_length)
     return count
 
