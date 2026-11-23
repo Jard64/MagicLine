@@ -105,7 +105,7 @@ THRUST_FLOOR = 0.35 # minimum thrust fraction (5.34)
 FLEX_MAX_REDUCTION = 0.25 # flex thrust >= 75 % of rated (7.2.4.1)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class Aircraft:
     """Paramètres avion (5.5.1). Valeurs par défaut : Boeing 737-800, CFM56-7B24, volets 5°."""
 
@@ -677,7 +677,7 @@ def is_inoperable(result: TakeOffResult, runway_length):
     return (not result.feasible) or result.TOFL > runway_length
 
 
-def inoperable_days(T_max_celsius, u, v, runway_length, runway_heading, h,
+def inoperable_days(T_max_celsius, u, v, runway_length, h,
                     mass=75000, ac: Aircraft = B738, **kwargs):
     """Compte les jours inopérables d'une piste sur une série journalière."""
     count = 0

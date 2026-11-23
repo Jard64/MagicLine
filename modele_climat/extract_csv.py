@@ -36,9 +36,13 @@ import pandas as pd
 import sys
 
 # airports_data.py et les CSV restent dans MagicLine/Donnees CMIP/
-DOSSIER_CMIP = Path(__file__).resolve().parent.parent / 'Donnees CMIP'
+DOSSIER_CMIP = Path(__file__).resolve().parent.parent / 'CMIP'
 sys.path.insert(0, str(DOSSIER_CMIP))
-from CMIP.airports_data import AIRPORTS
+
+import sys
+# caution: path[0] is reserved for script path (or '' in REPL)
+sys.path.insert(1, 'CMIP/')
+from airports_data import AIRPORTS
 
 DOSSIER_CSV = DOSSIER_CMIP / 'CSV'
 MOTIF = 'climat_aeroports_*.csv'
