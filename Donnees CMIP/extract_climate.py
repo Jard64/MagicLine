@@ -55,7 +55,7 @@ SCENARIOS = ['ssp245', 'ssp585']   # scénario intermédiaire et scénario fort
 
 # 'Amon' = valeurs mensuelles (tasmax = moyenne des maxima journaliers du mois)
 # 'day'  = valeurs journalières : environ 30 fois plus de données à télécharger
-TABLE = 'Amon'
+TABLE = 'day'
 
 # Codes des aéroports à traiter (voir airports_data.py).
 # Pour les 20 aéroports : AEROPORTS = list(AIRPORTS)
