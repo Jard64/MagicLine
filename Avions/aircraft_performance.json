@@ -1,0 +1,1796 @@
+{
+  "aircraft": {
+    "A380-800": {
+      "engine": "Engine Alliance GP7270",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 845,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 2.28,
+          "unit": "-",
+          "sources": [
+            2,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "VS1g = V2/1.13 = 150/1.13 kt ; CL_max = 2 x 560000 x 9.81 / (1.225 x 845 x VS1g^2)",
+          "note": "Valeur plancher : V2 indicatif de SKYbrary, souvent un peu au-dessus de 1.13 VS1g"
+        },
+        "CD0": {
+          "takeoff": 0.0282,
+          "clean": 0.016,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 10 degrés (approximation de CONF 1+F), train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP"
+        },
+        "K": {
+          "takeoff": 0.0485,
+          "clean": 0.05,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 4,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 332438,
+          "unit": "N per engine",
+          "sources": [
+            4
+          ]
+        },
+        "F_climb_base": {
+          "value": 326811,
+          "unit": "N per engine",
+          "sources": [
+            4
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 30,
+            "unit": "degC",
+            "isa_deviation": 15,
+            "sources": [
+              4
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "sources": [
+              4
+            ],
+            "note": "Flat rating de la poussée max continue"
+          }
+        },
+        "k_derate_TO": {
+          "value": 2190,
+          "unit": "N/degC per engine",
+          "sources": [
+            4,
+            3
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 332438 / (68 - 30), soit 0.66 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 68,
+            "unit": "degC",
+            "isa_deviation": 53,
+            "max_reduction": 0.25
+          },
+          "note": "Hypothèse : TMAXFLEX de l'A380 non trouvé. ISA+53 est la valeur médiane des TMAXFLEX Airbus relevées sur les autres fiches (ISA+48 à ISA+55), avec la limite standard de 25 %"
+        },
+        "k_derate_climb": {
+          "value": 2150,
+          "unit": "N/degC per engine",
+          "sources": [
+            4,
+            3
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00658 x 326811",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 277000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 560000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "A330-300": {
+      "engine": "Rolls-Royce Trent 772B-60",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 361.6,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 2.34,
+          "unit": "-",
+          "sources": [
+            6,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "VS1g = V2/1.13 = 145/1.13 kt ; CL_max = 2 x 230000 x 9.81 / (1.225 x 361.6 x VS1g^2)",
+          "note": "Valeur plancher : V2 indicatif de SKYbrary, souvent un peu au-dessus de 1.13 VS1g"
+        },
+        "CD0": {
+          "takeoff": 0.0367,
+          "clean": 0.022,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 10 degrés (approximation de CONF 1+F), train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP"
+        },
+        "K": {
+          "takeoff": 0.0397,
+          "clean": 0.041,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 316300,
+          "unit": "N per engine",
+          "sources": [
+            7
+          ]
+        },
+        "F_climb_base": {
+          "value": 282700,
+          "unit": "N per engine",
+          "sources": [
+            7
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 37,
+            "unit": "degC",
+            "isa_deviation": 22,
+            "sources": [
+              8
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "sources": [],
+            "note": "Hypothèse ISA+10 : flat rating max continu du Trent 772B non trouvé"
+          }
+        },
+        "k_derate_TO": {
+          "value": 3040,
+          "unit": "N/degC per engine",
+          "sources": [
+            7,
+            8,
+            9,
+            3
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 316300 / (63 - 37), soit 0.96 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 63,
+            "unit": "degC",
+            "isa_deviation": 48,
+            "max_reduction": 0.25
+          }
+        },
+        "k_derate_climb": {
+          "value": 2720,
+          "unit": "N/degC per engine",
+          "sources": [
+            7,
+            9,
+            3
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00962 x 282700",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 122780,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 242000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "A350-900": {
+      "engine": "Rolls-Royce Trent XWB-84",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 442,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 2.08,
+          "unit": "-",
+          "sources": [
+            10,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "VS1g = V2/1.13 = 150/1.13 kt ; CL_max = 2 x 268000 x 9.81 / (1.225 x 442 x VS1g^2)",
+          "note": "Valeur plancher : V2 indicatif de SKYbrary, souvent un peu au-dessus de 1.13 VS1g"
+        },
+        "CD0": {
+          "takeoff": 0.0355,
+          "clean": 0.022,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 10 degrés (approximation de CONF 1+F), train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP"
+        },
+        "K": {
+          "takeoff": 0.0416,
+          "clean": 0.043,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 374500,
+          "unit": "N per engine",
+          "sources": [
+            11
+          ]
+        },
+        "F_climb_base": {
+          "value": 317600,
+          "unit": "N per engine",
+          "sources": [
+            11
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "sources": [
+              12,
+              13
+            ],
+            "note": "TREF du FCOM (ISA+10 sous 2000 ft). Aviation Week indique ISA+15"
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "sources": [],
+            "note": "Hypothèse ISA+10 : flat rating max continu non trouvé"
+          }
+        },
+        "k_derate_TO": {
+          "value": 3000,
+          "unit": "N/degC per engine",
+          "sources": [
+            11,
+            12,
+            13
+          ],
+          "derived": true,
+          "method": "k = 0.4 x 374500 / (75 - 25), soit 0.80 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 75,
+            "unit": "degC",
+            "isa_deviation": 60,
+            "max_reduction": 0.4
+          },
+          "note": "L'A350 autorise jusqu'à 40 % de réduction en FLEX (au lieu de 25 %). Aviation Week donne un flat rating à ISA+15 : avec 30 degC au lieu de 25, k passerait à environ 3 330 N/degC"
+        },
+        "k_derate_climb": {
+          "value": 2540,
+          "unit": "N/degC per engine",
+          "sources": [
+            11,
+            12
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00800 x 317600",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 142400,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 280000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "B777-300ER": {
+      "engine": "GE90-115B",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 436.8,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 2.2,
+          "unit": "-",
+          "sources": [
+            14,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "VS1g = V2/1.13 = 168/1.13 kt ; CL_max = 2 x 351530 x 9.81 / (1.225 x 436.8 x VS1g^2)",
+          "note": "Valeur plancher : V2 indicatif de SKYbrary, souvent un peu au-dessus de 1.13 VS1g"
+        },
+        "CD0": {
+          "takeoff": 0.0407,
+          "clean": 0.024,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 15 degrés, train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP"
+        },
+        "K": {
+          "takeoff": 0.0409,
+          "clean": 0.043,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 513948,
+          "unit": "N per engine",
+          "sources": [
+            15
+          ]
+        },
+        "F_climb_base": {
+          "value": 489304,
+          "unit": "N per engine",
+          "sources": [
+            15
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 30,
+            "unit": "degC",
+            "isa_deviation": 15,
+            "sources": [
+              15
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "sources": [
+              15
+            ],
+            "note": "Flat rating de la poussée max continue"
+          }
+        },
+        "k_derate_TO": {
+          "value": 3380,
+          "unit": "N/degC per engine",
+          "sources": [
+            15,
+            16,
+            3
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 513948 / (68 - 30), soit 0.66 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 68,
+            "unit": "degC",
+            "isa_deviation": 53,
+            "max_reduction": 0.25
+          },
+          "note": "Hypothèse forte : aucune donnée publique sur la température assumed maximale du 777. Valeur ISA+53 reprise de l'exemple 737-800"
+        },
+        "k_derate_climb": {
+          "value": 3220,
+          "unit": "N/degC per engine",
+          "sources": [
+            15,
+            16,
+            3
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00658 x 489304",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 167800,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 351500,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "B787-8": {
+      "engine": "GE GEnx-1B70",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 377,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 1.72,
+          "unit": "-",
+          "sources": [
+            17,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "VS1g = V2/1.13 = 165/1.13 kt ; CL_max = 2 x 228000 x 9.81 / (1.225 x 377 x VS1g^2)",
+          "note": "Valeur plancher : V2 indicatif de SKYbrary, souvent un peu au-dessus de 1.13 VS1g"
+        },
+        "CD0": {
+          "takeoff": 0.0303,
+          "clean": 0.017,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 5 degrés, train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP"
+        },
+        "K": {
+          "takeoff": 0.0404,
+          "clean": 0.041,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 321600,
+          "unit": "N per engine",
+          "sources": [
+            18,
+            19
+          ]
+        },
+        "F_climb_base": {
+          "value": 295800,
+          "unit": "N per engine",
+          "sources": [
+            18,
+            19
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 30,
+            "unit": "degC",
+            "isa_deviation": 15,
+            "sources": [
+              20
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "sources": [
+              20
+            ],
+            "note": "Flat rating de la poussée max continue"
+          }
+        },
+        "k_derate_TO": {
+          "value": 2120,
+          "unit": "N/degC per engine",
+          "sources": [
+            18,
+            19,
+            20,
+            16,
+            3
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 321600 / (68 - 30), soit 0.66 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 68,
+            "unit": "degC",
+            "isa_deviation": 53,
+            "max_reduction": 0.25
+          },
+          "note": "Hypothèse forte : aucune donnée publique sur la température assumed maximale du 787. Valeur ISA+53 reprise de l'exemple 737-800"
+        },
+        "k_derate_climb": {
+          "value": 1950,
+          "unit": "N/degC per engine",
+          "sources": [
+            18,
+            19,
+            16,
+            3
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00658 x 295800",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 119000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 228000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "B787-9": {
+      "engine": "GE GEnx-1B74/75/P2",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 377,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 1.72,
+          "unit": "-",
+          "sources": [
+            17,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "Repris du 787-8 (même voilure et même surface alaire, SKYbrary ne donne pas de V2 pour le 787-9)",
+          "note": "Hypothèse"
+        },
+        "CD0": {
+          "takeoff": 0.0365,
+          "clean": 0.022,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 5 degrés, train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP. Polaire OpenAP du 787-9 utilisée telle quelle"
+        },
+        "K": {
+          "takeoff": 0.0413,
+          "clean": 0.042,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 341200,
+          "unit": "N per engine",
+          "sources": [
+            18,
+            19
+          ]
+        },
+        "F_climb_base": {
+          "value": 305100,
+          "unit": "N per engine",
+          "sources": [
+            18,
+            19
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 30,
+            "unit": "degC",
+            "isa_deviation": 15,
+            "sources": [
+              20
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "sources": [
+              20
+            ],
+            "note": "Flat rating de la poussée max continue"
+          }
+        },
+        "k_derate_TO": {
+          "value": 2240,
+          "unit": "N/degC per engine",
+          "sources": [
+            18,
+            19,
+            20,
+            16,
+            3
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 341200 / (68 - 30), soit 0.66 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 68,
+            "unit": "degC",
+            "isa_deviation": 53,
+            "max_reduction": 0.25
+          },
+          "note": "Hypothèse forte : aucune donnée publique sur la température assumed maximale du 787. Valeur ISA+53 reprise de l'exemple 737-800"
+        },
+        "k_derate_climb": {
+          "value": 2010,
+          "unit": "N/degC per engine",
+          "sources": [
+            18,
+            19,
+            16,
+            3
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00658 x 305100",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 128000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 254000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "B737 MAX 8": {
+      "engine": "CFM LEAP-1B28",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 124.6,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 2.08,
+          "unit": "-",
+          "sources": [
+            21,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "Repris du 737-800 (même voilure, SKYbrary ne donne pas de V2 pour le MAX 8)",
+          "note": "Hypothèse"
+        },
+        "CD0": {
+          "takeoff": 0.038,
+          "clean": 0.02,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 5 degrés (flaps 5), train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP"
+        },
+        "K": {
+          "takeoff": 0.0413,
+          "clean": 0.042,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 130409,
+          "unit": "N per engine",
+          "sources": [
+            22
+          ],
+          "note": "Poussée certifiée du LEAP-1B28 (29 317 lbf). Boeing annonce le MAX 8 à 27 900 lbf : la poussée réellement disponible sur l'avion peut être plus basse",
+          "note_sources": [
+            23
+          ]
+        },
+        "F_climb_base": {
+          "value": 127619,
+          "unit": "N per engine",
+          "sources": [
+            22
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 30,
+            "unit": "degC",
+            "isa_deviation": 15,
+            "sources": [
+              22
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "note": "Flat rating de la poussée max continue",
+            "sources": [
+              22
+            ]
+          }
+        },
+        "k_derate_TO": {
+          "value": 860,
+          "unit": "N/degC per engine",
+          "sources": [
+            22,
+            3,
+            16
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 130409 / (68 - 30), soit 0.66 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 68,
+            "unit": "degC",
+            "isa_deviation": 53
+          },
+          "note": "TMAX d'assumed temperature Boeing (ISA+53) tirée d'un exemple FCOM 737-800 26K ; pour le MAX 8, même valeur supposée faute de source"
+        },
+        "k_derate_climb": {
+          "value": 840,
+          "unit": "N/degC per engine",
+          "sources": [
+            22,
+            3,
+            16
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00658 x 127619",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 45000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 82000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "B737-800": {
+      "engine": "CFM56-7B26",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 124.6,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 2.08,
+          "unit": "-",
+          "sources": [
+            21,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "VS1g = V2/1.13 = 145/1.13 kt ; CL_max = 2 x 70530 x 9.81 / (1.225 x 124.6 x VS1g^2)",
+          "note": "Valeur plancher : V2 indicatif de SKYbrary, souvent un peu au-dessus de 1.13 VS1g"
+        },
+        "CD0": {
+          "takeoff": 0.0365,
+          "clean": 0.019,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 5 degrés (flaps 5), train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP"
+        },
+        "K": {
+          "takeoff": 0.0413,
+          "clean": 0.042,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 116990,
+          "unit": "N per engine",
+          "sources": [
+            24,
+            25
+          ]
+        },
+        "F_climb_base": {
+          "value": 115210,
+          "unit": "N per engine",
+          "sources": [
+            24,
+            25
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 30,
+            "unit": "degC",
+            "isa_deviation": 15,
+            "sources": [
+              25
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "note": "Flat rating de la poussée max continue",
+            "sources": [
+              25
+            ]
+          }
+        },
+        "k_derate_TO": {
+          "value": 770,
+          "unit": "N/degC per engine",
+          "sources": [
+            24,
+            25,
+            3,
+            16
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 116990 / (68 - 30), soit 0.66 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 68,
+            "unit": "degC",
+            "isa_deviation": 53
+          },
+          "note": "TMAX d'assumed temperature Boeing (ISA+53) tirée d'un exemple FCOM 737-800 26K ; pour le MAX 8, même valeur supposée faute de source"
+        },
+        "k_derate_climb": {
+          "value": 760,
+          "unit": "N/degC per engine",
+          "sources": [
+            24,
+            25,
+            3,
+            16
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00658 x 115210",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 41400,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 79000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "A321neo": {
+      "engine": "CFM LEAP-1A33",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 128,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 2.68,
+          "unit": "-",
+          "sources": [
+            28,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "VS1g = V2/1.13 = 145/1.13 kt ; CL_max = 2 x 93500 x 9.81 / (1.225 x 128 x VS1g^2)",
+          "note": "Valeur plancher : V2 indicatif de SKYbrary, souvent un peu au-dessus de 1.13 VS1g"
+        },
+        "CD0": {
+          "takeoff": 0.0373,
+          "clean": 0.017,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 10 degrés (CONF 1+F), train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP. Polaire de traînée OpenAP empruntée à l'A320neo (synonyme OpenAP, pas de polaire propre à l'A321neo)"
+        },
+        "K": {
+          "takeoff": 0.0369,
+          "clean": 0.038,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 143050,
+          "unit": "N per engine",
+          "sources": [
+            26
+          ]
+        },
+        "F_climb_base": {
+          "value": 140960,
+          "unit": "N per engine",
+          "sources": [
+            26
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 30,
+            "unit": "degC",
+            "isa_deviation": 15,
+            "sources": [
+              26
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "note": "Flat rating de la poussée max continue",
+            "sources": [
+              26
+            ]
+          }
+        },
+        "k_derate_TO": {
+          "value": 970,
+          "unit": "N/degC per engine",
+          "sources": [
+            26,
+            3,
+            27
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 143050 / (67 - 30), soit 0.68 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 67,
+            "unit": "degC",
+            "isa_deviation": 52
+          }
+        },
+        "k_derate_climb": {
+          "value": 950,
+          "unit": "N/degC per engine",
+          "sources": [
+            26,
+            3,
+            27
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00676 x 140960",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 50000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 97000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "A320ceo": {
+      "engine": "CFM56-5B4",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 124,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 2.18,
+          "unit": "-",
+          "sources": [
+            29,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "VS1g = V2/1.13 = 145/1.13 kt ; CL_max = 2 x 73500 x 9.81 / (1.225 x 124 x VS1g^2)",
+          "note": "Valeur plancher : V2 indicatif de SKYbrary, souvent un peu au-dessus de 1.13 VS1g"
+        },
+        "CD0": {
+          "takeoff": 0.0357,
+          "clean": 0.018,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 10 degrés (CONF 1+F), train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP"
+        },
+        "K": {
+          "takeoff": 0.0378,
+          "clean": 0.039,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 120100,
+          "unit": "N per engine",
+          "sources": [
+            30
+          ]
+        },
+        "F_climb_base": {
+          "value": 108400,
+          "unit": "N per engine",
+          "sources": [
+            30
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 45,
+            "unit": "degC",
+            "isa_deviation": 30,
+            "sources": [
+              30
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "note": "Flat rating de la poussée max continue",
+            "sources": [
+              30
+            ]
+          }
+        },
+        "k_derate_TO": {
+          "value": 1310,
+          "unit": "N/degC per engine",
+          "sources": [
+            30,
+            3,
+            27
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 120100 / (68 - 45), soit 1.09 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 68,
+            "unit": "degC",
+            "isa_deviation": 53
+          }
+        },
+        "k_derate_climb": {
+          "value": 1180,
+          "unit": "N/degC per engine",
+          "sources": [
+            30,
+            3,
+            27
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.01087 x 108400",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 42600,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 78000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    },
+    "A320neo": {
+      "engine": "CFM LEAP-1A26",
+      "geometric_aerodynamic": {
+        "wing_reference_area": {
+          "value": 124,
+          "unit": "m2",
+          "sources": [
+            1
+          ]
+        },
+        "CL_max": {
+          "value": 2.18,
+          "unit": "-",
+          "sources": [
+            31,
+            1,
+            3
+          ],
+          "derived": true,
+          "method": "VS1g = V2/1.13 = 145/1.13 kt ; CL_max = 2 x 73500 x 9.81 / (1.225 x 124 x VS1g^2)",
+          "note": "Valeur plancher : V2 indicatif de SKYbrary, souvent un peu au-dessus de 1.13 VS1g"
+        },
+        "CD0": {
+          "takeoff": 0.0349,
+          "clean": 0.017,
+          "unit": "-",
+          "sources": [
+            1
+          ],
+          "takeoff_configuration": "volets 10 degrés (CONF 1+F), train sorti",
+          "note": "Configuration décollage calculée avec les formules du module drag.py d'OpenAP"
+        },
+        "K": {
+          "takeoff": 0.0368,
+          "clean": 0.038,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "K_VS1g_min": {
+          "value": 1.13,
+          "unit": "-",
+          "sources": [
+            3
+          ],
+          "note": "CS 25.107(b), minimum réglementaire"
+        }
+      },
+      "propulsion": {
+        "number_of_engines": {
+          "value": 2,
+          "unit": "-",
+          "sources": [
+            1
+          ]
+        },
+        "F_TO_base": {
+          "value": 120640,
+          "unit": "N per engine",
+          "sources": [
+            26
+          ]
+        },
+        "F_climb_base": {
+          "value": 118680,
+          "unit": "N per engine",
+          "sources": [
+            26
+          ],
+          "note": "Poussée max continue utilisée comme approximation de la poussée de montée (non publiée)"
+        },
+        "T_flat": {
+          "takeoff": {
+            "value": 44,
+            "unit": "degC",
+            "isa_deviation": 29,
+            "sources": [
+              26
+            ]
+          },
+          "climb": {
+            "value": 25,
+            "unit": "degC",
+            "isa_deviation": 10,
+            "note": "Flat rating de la poussée max continue",
+            "sources": [
+              26
+            ]
+          }
+        },
+        "k_derate_TO": {
+          "value": 1160,
+          "unit": "N/degC per engine",
+          "sources": [
+            26,
+            3,
+            27
+          ],
+          "derived": true,
+          "method": "k = 0.25 x 120640 / (70 - 44), soit 0.96 %/degC",
+          "t_max_reduced_thrust": {
+            "value": 70,
+            "unit": "degC",
+            "isa_deviation": 55
+          }
+        },
+        "k_derate_climb": {
+          "value": 1140,
+          "unit": "N/degC per engine",
+          "sources": [
+            26,
+            3,
+            27
+          ],
+          "derived": true,
+          "method": "Même taux relatif qu'au décollage : 0.00962 x 118680",
+          "note": "Hypothèse, aucune source ne donne directement cette valeur"
+        }
+      },
+      "operational": {
+        "operating_empty_weight": {
+          "value": 44300,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "max_takeoff_weight": {
+          "value": 79000,
+          "unit": "kg",
+          "sources": [
+            1
+          ]
+        },
+        "rolling_friction_coefficient": {
+          "value": 0.02,
+          "unit": "-",
+          "sources": [
+            5
+          ],
+          "note": "Piste sèche revêtue"
+        }
+      }
+    }
+  },
+  "sources": [
+    {
+      "id": 1,
+      "title": "OpenAP, Open Aircraft Performance Model (TU Delft), fichiers avion et polaires de traînée",
+      "reference": "Sun, Hoekstra, Ellerbroek, Aerospace 7(8):104, 2020",
+      "url": "https://github.com/TUDelft-CNS-ATM/openap"
+    },
+    {
+      "id": 2,
+      "title": "SKYbrary / Eurocontrol, A380-800 : V2 150 kt à 560 000 kg",
+      "url": "https://skybrary.aero/aircraft/a388"
+    },
+    {
+      "id": 3,
+      "title": "EASA CS-25, Amendment 28 (CS 25.107(b) ; AMC 25-13, réduction de poussée limitée à 25 %)",
+      "url": "https://www.easa.europa.eu/mt/downloads/139073/en"
+    },
+    {
+      "id": 4,
+      "title": "FAA TCDS E00072EN, Engine Alliance GP7200 (GP7270 : 74 735 lb décollage, 73 470 lb max continu, flat rating 30 degC / 25 degC)",
+      "url": "https://corpora.tika.apache.org/base/docs/govdocs1/487/487711.pdf",
+      "note": "Révision 1 (2008)"
+    },
+    {
+      "id": 5,
+      "title": "Leishman, Introduction to Aerospace Flight Vehicles, Embry-Riddle (Takeoff & Landing Performance)",
+      "url": "https://eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/?p=595"
+    },
+    {
+      "id": 6,
+      "title": "SKYbrary / Eurocontrol, A330-300 : V2 145 kt à 230 000 kg (miroir de la fiche SKYbrary A333)",
+      "url": "https://dru10.imibo.com/node/17551",
+      "other_urls": [
+        "https://skybrary.aero/aircraft/a333"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "EASA TCDS E.042, RB211 Trent 700 (Trent 772B-60 : 316,3 kN décollage, 282,7 kN max continu)",
+      "url": "https://www.easa.europa.eu/hr/downloads/7723/en"
+    },
+    {
+      "id": 8,
+      "title": "Airbus, 11th Performance and Operations Conference (TREF par moteur : Trent 772B ISA+22 à 2000 ft et en dessous)",
+      "url": "https://www.scribd.com/document/257768689/temp-Inversion",
+      "note": "Document Airbus diffusé sur Scribd"
+    },
+    {
+      "id": 9,
+      "title": "Limitations A330 (FCOM), fiches de révision pilotes : TMAXFLEX ISA+48, réduction max 25 %",
+      "url": "https://brainscape.com/flashcards/a330-limitations-1247278/packs/2771041",
+      "note": "Source secondaire, le FCOM n'est pas public"
+    },
+    {
+      "id": 10,
+      "title": "SKYbrary / Eurocontrol, A350-900 : V2 150 kt à 268 000 kg",
+      "url": "https://www.skybrary.aero/index.php/A359"
+    },
+    {
+      "id": 11,
+      "title": "EASA TCDS E.111, Trent XWB (XWB-84 : 374,5 kN décollage, 317,6 kN max continu)",
+      "url": "https://www.easa.europa.eu/en/downloads/7635/en"
+    },
+    {
+      "id": 12,
+      "title": "Limitations A350 (FCOM), fiches de révision pilotes : TREF ISA+10 sous 2000 ft, TMAXFLEX ISA+60 (40 % de réduction)",
+      "url": "https://www.brainscape.com/flashcards/a350-limitations-5826160/packs/8877868",
+      "note": "Source secondaire, le FCOM n'est pas public"
+    },
+    {
+      "id": 13,
+      "title": "Aviation Week, Airbus A350's Rolls-Royce Trent XWBs (XWB-84 rated at 84 200 lb up to ISA+15)",
+      "url": "https://aviationweek.com/airbus-a350s-rolls-royce-trent-xwbs"
+    },
+    {
+      "id": 14,
+      "title": "SKYbrary / Eurocontrol, 777-300ER : V2 168 kt à 351 530 kg",
+      "url": "https://skybrary.aero/aircraft/b77w"
+    },
+    {
+      "id": 15,
+      "title": "JCAB TADS n°611, GE90 (GE90-115B : 115 540 lb décollage, 110 000 lb max continu, flat rating 30 degC / 25 degC), reprise de la FAA TCDS E00049EN",
+      "url": "https://asims.cab.mlit.go.jp/fsdb/a_katashiki.nsf/8344a61f244404e6492574eb003898d6/ba674633d706237d492575b60023e22c/%24FILE/34307323.pdf/TADS_No.611-4%20%28GE90%20series%29%20rev.4.pdf"
+    },
+    {
+      "id": 16,
+      "title": "IVAO, Reduced thrust takeoff B737 (exemple FCOM 737-800 26K : température assumed max 64 degC à 2000 ft, soit ISA+53)",
+      "url": "https://wiki.ivao.aero/en/home/training/documentation/Reduced_thrust_takeoff_B737",
+      "note": "Source secondaire, utilisée faute de donnée publique pour les autres avions Boeing"
+    },
+    {
+      "id": 17,
+      "title": "SKYbrary / Eurocontrol, 787-8 : V2 165 kt à 228 000 kg",
+      "url": "https://skybrary.aero/aircraft/b788"
+    },
+    {
+      "id": 18,
+      "title": "EASA TCDS IM.E.102, GEnx (poussées décollage et max continu)",
+      "url": "https://www.easa.europa.eu/en/downloads/7641/en"
+    },
+    {
+      "id": 19,
+      "title": "GE Aerospace, fiche GEnx (-1B70 pour le 787-8, -1B74/75 pour le 787-9)",
+      "url": "https://www.geaerospace.com/commercial/aircraft-engines/genx"
+    },
+    {
+      "id": 20,
+      "title": "Wikipedia, General Electric GEnx (tableau des variantes repris de la FAA TCDS E00078NE : flat rating ISA+15 au décollage, ISA+10 en max continu)",
+      "url": "https://bafybeiemxf5abjwjbikoz4mc3a3dla6ual3jsgpdr4cjr3oz3evfyavhwq.ipfs.4everland.io/wiki/GEnx.html",
+      "note": "Copie de Wikipedia"
+    },
+    {
+      "id": 21,
+      "title": "SKYbrary / Eurocontrol Aircraft Performance Database, 737-800 : données de performance indicatives (V2 et masse associée)",
+      "url": "https://skybrary.aero/aircraft/b738"
+    },
+    {
+      "id": 22,
+      "title": "NTSB, rapport Powerplant DCA24LA330, citant la FAA TCDS E00088EN (LEAP-1B28)",
+      "url": "https://data.ntsb.gov/Docket/Document/docBLOB?ID=19831677&FileExtension=pdf&FileName=DCA24LA330+-+Powerplant+Specialist+Factual+Report-Rel.pdf"
+    },
+    {
+      "id": 23,
+      "title": "ISTAT, Appraisal: CFM LEAP-1B (réglages de poussée du MAX 8 : 25 000, 26 400 et 27 900 lbf)",
+      "url": "https://www.istat.org/ISTAT-Online/ISTAT-Online/Aircraft/ArtMID/1205/ArticleID/1639/Appraisal-CFM-LEAP-1B"
+    },
+    {
+      "id": 24,
+      "title": "EASA TCDS E.004, CFM56-7B (poussées CFM56-7B26)",
+      "url": "https://www.easa.europa.eu/en/downloads/7795/en"
+    },
+    {
+      "id": 25,
+      "title": "Aircraft Commerce n°58, CFM56-7B Operator's & Owner's Guide (flat rating ISA+15 au décollage, ISA+10 en max continu)",
+      "url": "https://www.aircraft-commerce.com/wp-content/uploads/aircraft-commerce-docs1/Aircraft%20guides/CFM56-7B/ISSUE58_CFM56_7B_GUIDE.pdf"
+    },
+    {
+      "id": 26,
+      "title": "FAA TCDS E00089EN, CFM LEAP-1A (LEAP-1A26 et LEAP-1A33)",
+      "url": "https://airinsight.com/wp-content/uploads/2016/03/E00089EN_Rev_1.pdf",
+      "note": "Révision 1 (2016), dernière révision sur drs.faa.gov"
+    },
+    {
+      "id": 27,
+      "title": "Limitations moteurs FCOM Airbus (TMAXFLEX), fiches de révision pilotes",
+      "url": "https://brainscape.com/flashcards/limitations-engines-17308566/packs/22472647",
+      "note": "Source secondaire, le FCOM n'est pas public"
+    },
+    {
+      "id": 28,
+      "title": "SKYbrary / Eurocontrol Aircraft Performance Database, données de performance indicatives (V2 et masse associée)",
+      "url": "https://www.skybrary.aero/index.php/A21N"
+    },
+    {
+      "id": 29,
+      "title": "SKYbrary / Eurocontrol Aircraft Performance Database, données de performance indicatives (V2 et masse associée)",
+      "url": "https://ww.skybrary.aero/index.php/A320"
+    },
+    {
+      "id": 30,
+      "title": "FAA TCDS E37NE, CFM56-5B (CFM56-5B4)",
+      "url": "https://airinsight.com/wp-content/uploads/2016/04/E37NE_Rev_13.pdf",
+      "note": "Révision 13 (2014)"
+    },
+    {
+      "id": 31,
+      "title": "SKYbrary / Eurocontrol Aircraft Performance Database, données de performance indicatives (V2 et masse associée)",
+      "url": "https://www.skybrary.aero/index.php/A20N"
+    }
+  ]
+}
