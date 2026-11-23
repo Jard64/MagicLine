@@ -9,11 +9,8 @@
     Trouver un moyen d'ajouter les coordonnées gps dans les exports? 
     """
 
-
 import numpy as np
 import pandas as pd
-
-
 
 def charger_donnees():
     return
