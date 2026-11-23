@@ -20,7 +20,7 @@ Tableau obtenu (format « long », une ligne par aéroport/scénario/modèle/dat
 
 Usage :
     from extract_csv import charger_donnees, filtrer
-    df = charger_donnees()                                   # tous les CSV du dossier CSV/
+    df = charger_donnees()                                   # tous les CSV de Donnees CMIP/CSV/
     cdg = filtrer(df, aeroports='CDG', scenarios='ssp585', debut='2050', fin='2059')
     cdg.groupby('modele')['tasmax_C'].max()
 
@@ -33,9 +33,15 @@ from pathlib import Path
 
 import pandas as pd
 
+import sys
+
+# airports_data.py et les CSV restent dans MagicLine/Donnees CMIP/
+DOSSIER_CMIP = Path(__file__).resolve().parent.parent / 'Donnees CMIP'
+sys.path.insert(0, str(DOSSIER_CMIP))
+
 from airports_data import AIRPORTS
 
-DOSSIER_CSV = Path(__file__).resolve().parent / 'CSV'
+DOSSIER_CSV = DOSSIER_CMIP / 'CSV'
 MOTIF = 'climat_aeroports_*.csv'
 
 # climat_aeroports_day_2026-2100_CNRM-CM6-1.csv (préfixe de table facultatif)

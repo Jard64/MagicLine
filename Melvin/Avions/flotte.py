@@ -24,9 +24,9 @@ import warnings
 import numpy as np
 
 from avions import CATALOGUE, charger_catalogue, flotte
-from MelvinxClaudine import (Aircraft, G0, KELVIN, RHO_0, K_VS1G_MIN, density, delta_isa,
-                             engine_thrust, climb_gradient_s2, temperature_isa,
-                             take_off_performance, is_inoperable)
+from modele_climatique import (Aircraft, G0, KELVIN, RHO_0, K_VS1G_MIN, density, delta_isa,
+                               engine_thrust, climb_gradient_s2, temperature_isa,
+                               take_off_performance, is_inoperable)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FIGURES = os.path.join(HERE, "figures")

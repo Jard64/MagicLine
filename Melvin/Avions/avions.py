@@ -1,5 +1,5 @@
 r"""
-Construction des avions du modèle Magic Line (MelvinxClaudine.py) à partir du catalogue.
+Construction des avions du modèle Magic Line (modele_climatique.py) à partir du catalogue.
 
 Le catalogue (catalogue.csv, rempli par import_catalogue.py) contient les données
 brutes sourcées de chaque avion : OpenAP, ICAO Engine Emissions Databank, EUROCONTROL
@@ -37,11 +37,13 @@ import math
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# modele_climatique.py est dans MagicLine/modele_climat/
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__)))), 'modele_climat'))
 
-from MelvinxClaudine import (Aircraft, B738, G0, RHO_0, K_VS1G_MIN, MAGIC_LINE_TWIN,
-                             MAGIC_LINE_UNIFIED, MAGIC_LINE_QUAD, MAGIC_LINE_B738,
-                             take_off_performance)
+from modele_climatique import (Aircraft, B738, G0, RHO_0, K_VS1G_MIN, MAGIC_LINE_TWIN,
+                               MAGIC_LINE_UNIFIED, MAGIC_LINE_QUAD, MAGIC_LINE_B738,
+                               take_off_performance)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CATALOGUE = os.path.join(HERE, "catalogue.csv")

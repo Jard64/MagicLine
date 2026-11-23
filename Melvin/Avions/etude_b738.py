@@ -2,7 +2,7 @@ r"""
 Étude indépendante du B737-800 et comparaison avec la modélisation de la thèse.
 
 Trois jeux de paramètres :
-  "Thèse"            B738 de MelvinxClaudine.py (5.5.1), droite Magic Line B737-800
+  "Thèse"            B738 de modele_climatique.py (5.5.1), droite Magic Line B737-800
   "Direct"           paramètres reconstruits depuis les sources publiques (avions.py,
                      methode="direct"), même droite Magic Line B737-800
   "Direct + bimot."  idem, droite bimoteur générique de la thèse (celle de la flotte)
@@ -21,8 +21,8 @@ import numpy as np
 from avions import charger_catalogue, construire_avion
 from flotte import (FIGURES, SERIES, INK, INK_2, SURFACE, _style, tofl, tofl_torenbeek,
                     delta_isa_s2)
-from MelvinxClaudine import (B738, MAGIC_LINE_B738, KELVIN, K_VS1G_MIN, temperature_isa,
-                             take_off_performance)
+from modele_climatique import (B738, MAGIC_LINE_B738, KELVIN, K_VS1G_MIN, temperature_isa,
+                               take_off_performance)
 
 cat = charger_catalogue()
 ROW = cat["B737-800 (CFM56-7B26)"]
